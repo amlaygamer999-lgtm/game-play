@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حروف مع عبادي</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root { 
+            --primary: #ffeb3b; --secondary: #4fc3f7; --bg-purple: #4a148c; 
+            --red: #f44336; --green: #00e676; --text: #fff; 
+        }
+
+        body { 
+            background-color: var(--bg-purple); color: var(--text); 
+            font-family: 'Tajawal', sans-serif; margin: 0; height: 100vh; overflow: hidden; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        }
+        
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: absolute; top: 0; left: 0; z-index: 1; }
+        .active { display: flex; }
+
+        /* الشاشة الأولى */
+        #scr-setup {
+            background-image: url('47267.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;
+            justify-content: flex-end; padding-bottom: 30px; 
+        }
+
+        .login-bar {
+            background: rgba(74, 20, 140, 0.85); width: 90%; max-width: 1100px; padding: 15px; border-radius: 50px;
+            border: 2px solid var(--primary); box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px;
+        }
+        .login-bar input {
+            background: rgba(255,255,255,0.95); border: none; border-radius: 30px; padding: 10px 20px;
+            font-size: 1.1rem; color: #4a148c; font-weight: bold; font-family: 'Tajawal'; width: 35%; text-align: center; margin: 0;
+        }
+        .login-bar button {
+            background: var(--primary); color: #4a148c; border: none; padding: 10px 40px; font-size: 1.2rem;
+            border-radius: 30px; cursor: pointer; font-weight: 900; white-space: nowrap; margin: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* تنسيقات عامة */
+        #scr-connect, #scr-host { justify-content: center; }
+        .btn-action { width: 90%; margin: 8px auto; font-size: 1.1rem; padding: 15px; display: block; border-radius: 15px; cursor: pointer; border: none; font-weight: bold; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 20px; padding: 20px; }
+        .letter-box { width: 80px; height: 80px; background: #fff; color: #4a148c; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; font-weight: 900; cursor: pointer; transition: 0.3s; border: 4px solid #ddd; box-shadow: 0 5px 0 #bbb; }
+        .letter-box.red { background: var(--red); color: white; border-color: #d32f2f; box-shadow: 0 5px 0 #b71c1c; }
+        .letter-box.green { background: var(--green); color: white; border-color: #388e3c; box-shadow: 0 5px 0 #2e7d32; }
+
+        .results-wrapper { display: flex; width: 100%; height: 80%; justify-content: space-around; align-items: flex-start; padding-top: 20px; overflow-y: auto; }
+        .res-col { width: 45%; background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; min-height: 50%; display: flex; flex-direction: column; align-items: center; border: 2px solid rgba(255,255,255,0.2); }
+        .res-word { width: 100%; font-size: 1.3rem; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .res-word.approved { color: #69f0ae; font-weight: bold; }
+
+        .team-letters-strip { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; width: 100%; }
+        .tiny-letter { width: 35px; height: 35px; border-radius: 50%; background: #fff; color: #4a148c; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: bold; }
+
+        .mobile-view { padding: 20px; text-align: center; justify-content: flex-start; overflow-y: auto; background: #f3e5f5; color: #333; }
+        #timer-box { font-size: 3.5rem; color: var(--primary); font-family: monospace; text-shadow: 2px 2px 0 #000; background: rgba(0,0,0,0.3); padding: 5px 30px; border-radius: 15px; }
+        
+        .qr-row { display: flex; gap: 40px; margin-bottom: 30px; }
+        .qr-card { background: white; padding: 20px; border-radius: 20px; color: #4a148c; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .qr-img { width: 150px; height: 150px; display: block; }
+
+        #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a148c; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 10px solid var(--primary); }
+        #q-char-disp { font-size: 6rem; color: var(--primary); margin-bottom: 10px; text-shadow: 0 5px 0 #000; }
+        #q-text { font-size: 2.2rem; margin-bottom: 20px; color: white; line-height: 1.4; font-weight: bold; }
+        #q-answer { font-size: 1.8rem; color: #fff; background: var(--green); padding: 10px 30px; border-radius: 50px; margin-top: 20px; display: none; }
+        
+        #buzzer-btn { width: 220px; height: 220px; border-radius: 50%; background: #f44336; color: white; font-size: 2.5rem; font-weight: bold; border: 8px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.4); margin-top: 20px; }
+        
+        #admin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 20, 140, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
+        
+        .judge-btn { border: none; border-radius: 5px; padding: 5px 12px; margin-left: 5px; cursor: pointer; font-size: 1.2rem; }
+        .btn-ok { background: var(--green); color: white; }
+        .btn-no { background: var(--red); color: white; }
+        .btn-start { background: var(--primary); color: #4a148c; border: 4px solid #fff; }
+
+        .audio-wave { display: none; font-size: 3rem; color: var(--primary); margin-bottom: 20px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+
+        .q-select-btn { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 10px; color: white; font-size: 1.1rem; text-align: right; cursor: pointer; }
+
+        .hurry-img { width: 100%; max-width: 400px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid var(--primary); }
+
+        /* زر إعادة اللعبة في الشاشة الرئيسية */
+        .reset-btn-corner {
+            position: fixed; top: 20px; left: 20px;
+            background: rgba(255, 0, 0, 0.7); color: white;
+            border: none; padding: 10px 20px; border-radius: 30px;
+            cursor: pointer; font-size: 1rem; font-weight: bold;
+            z-index: 9999; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+        .reset-btn-corner:hover { background: red; }
+    </style>
+</head>
+<body>
+
+    <div id="scr-setup" class="screen active">
+        <div class="login-bar">
+            <input type="text" id="t1" placeholder="الفريق الأحمر">
+            <input type="text" id="t2" placeholder="الفريق الأخضر">
+            <button onclick="createGame()">انطلق 🚀</button>
+        </div>
+    </div>
+
+    <div id="scr-connect" class="screen">
+        <h1 style="color:var(--primary); font-size:3rem; margin-bottom:10px;">امسح للانضمام</h1>
+        <audio id="audio-rules" src="rules.mp3" preload="auto"></audio>
+        <audio id="audio-wrong" src="wrong.mp3" preload="auto"></audio>
+        
+        <div id="audio-visual" class="audio-wave">🔊 جاري تشغيل الصوت...</div>
+        <div class="qr-row">
+            <div class="qr-card"><div id="qr-red-container"></div><h2 style="color:var(--red); margin:5px 0;">الفريق الأحمر</h2></div>
+            <div class="qr-card"><div id="qr-green-container"></div><h2 style="color:var(--green); margin:5px 0;">الفريق الأخضر</h2></div>
+        </div>
+        <button class="btn-start" style="font-size:1.2rem; padding:10px 30px;" onclick="startGameDisplay()">الانتقال للوحة الحروف</button>
+        <div style="position: absolute; bottom: 20px; left: 20px; background: white; padding: 10px; border-radius:15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            <div id="qr-admin-container"></div><small style="color:var(--bg-purple); font-weight:bold; display:block;">المقدم</small>
+        </div>
+    </div>
+
+    <div id="scr-host" class="screen">
+        <button class="reset-btn-corner" onclick="fullReset()">🔄 إعادة اللعبة</button>
+
+        <div style="width: 100%; display: flex; justify-content: space-between; padding: 20px 50px; box-sizing: border-box; font-size: 2.5rem; font-weight: 900; text-shadow: 2px 2px 5px rgba(0,0,0,0.3);">
+            <span style="color: #ff8a80" id="lbl-t1">الأحمر</span>
+            <div id="timer-box">00:00</div>
+            <span style="color: #69f0ae" id="lbl-t2">الأخضر</span>
+        </div>
+        <div id="host-grid" class="grid-container"></div>
+        <div id="host-waiting" style="display:none; margin-top:50px; text-align: center;">
+            <h1 style="font-size: 4rem; color: var(--primary);">⏳</h1>
+            <h2>الحكم يقوم بمراجعة الإجابات...</h2>
+        </div>
+        <div id="host-results" class="results-wrapper" style="display: none;">
+            <div class="res-col" style="border: 4px solid var(--red)">
+                <h2 style="color: var(--red)">الأحمر (<span id="score-red">0</span>)</h2>
+                <div id="res-chars-red" class="team-letters-strip"></div>
+                <div id="list-red" style="width:100%"></div>
+            </div>
+            <div class="res-col" style="border: 4px solid var(--green)">
+                <h2 style="color: var(--green)">الأخضر (<span id="score-green">0</span>)</h2>
+                <div id="res-chars-green" class="team-letters-strip"></div>
+                <div id="list-green" style="width:100%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scr-admin" class="screen mobile-view">
+        <h2 style="color:var(--bg-purple)">لوحة التحكم 🛠</h2>
+        
+        <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px;">
+            <button style="background:#9c27b0; color:white; width:100%; border-radius:15px; padding:10px; margin-bottom:10px;" onclick="playAudio('rules')">📢 تشغيل الشرح</button>
+            <button style="background:#000; color:white; width:100%; border-radius:15px; padding:10px;" onclick="playAudio('wrong')">👎 تأثير الغلط</button>
+        </div>
+
+        <div id="admin-p1">
+            <button style="background:#000; color:white; width:100%; border-radius:15px; padding:10px; margin-bottom:20px;" onclick="playAudio('wrong')">👎 تشغيل صوت الغلط</button>
+            <p>اضغط الحرف لاختيار السؤال:</p>
+            <div id="admin-grid" class="grid-container" style="grid-template-columns: repeat(5, 1fr); zoom: 0.6;"></div>
+            <button class="btn-start" onclick="setPhase(2)" style="width: 100%; margin-top: 20px;">الانتقال لمرحلة الكلمات</button>
+        </div>
+
+        <div id="admin-p2" style="display: none;">
+            <h3>المرحلة 2: الكلمات</h3>
+            <div style="background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                <label>الوقت (دقائق):</label>
+                <input type="number" id="custom-timer-input" value="2" style="width: 60px; border:1px solid #ccc;">
+                <button style="background: orange; border-radius:10px; padding:5px 15px; font-size:1rem;" onclick="startTimer()">ابدأ</button>
+            </div>
+            <button style="background: var(--red); width: 90%; padding:15px; border-radius:10px; color:white;" onclick="stopTimer()">إنهاء الوقت (إيقاف التسجيل)</button>
+        </div>
+
+        <div id="admin-p3" style="display: none;">
+            <h3>🧐 التحكيم</h3>
+            <div style="border: 2px solid var(--red); background:white; padding:10px; margin-bottom:10px; border-radius:10px;">
+                <h4 style="color:var(--red); margin:0;">الأحمر:</h4>
+                <div id="review-chars-red" class="team-letters-strip"></div>
+                <div id="review-list-red"></div>
+            </div>
+            <div style="border: 2px solid var(--green); background:white; padding:10px; margin-bottom:10px; border-radius:10px;">
+                <h4 style="color:var(--green); margin:0;">الأخضر:</h4>
+                <div id="review-chars-green" class="team-letters-strip"></div>
+                <div id="review-list-green"></div>
+            </div>
+            <button style="background: var(--secondary); color:white; width: 100%; padding:15px; border-radius:10px;" onclick="publishResults()">📺 نشر النتائج</button>
+        </div>
+    </div>
+
+    <div id="scr-player" class="screen mobile-view">
+        <h2 id="p-team-name">فريقي</h2>
+        <div id="p-p1">
+            <h3>حروفنا:</h3>
+            <div id="p-letters" class="team-letters-strip" style="background:white;"></div>
+            <p style="color:#666;">انتظر السؤال...</p>
+        </div>
+        <div id="p-p2" style="display: none;">
+            <img src="hurry.jpg" class="hurry-img" alt="اخلصوا بسرعة">
+            <h3>أكتب كلماتك:</h3>
+            <div id="p-letters-2" class="team-letters-strip" style="background:white;"></div>
+            <input type="text" id="word-in" placeholder="كلمة...">
+            <button class="btn-start" onclick="sendWord()">إرسال</button>
+            <p id="sent-msg" style="color: var(--green); margin-top:10px;"></p>
+        </div>
+        <div id="p-p3" style="display: none;">
+            <h2>انتهى الوقت 🛑</h2>
+            <p>الحكم يراجع النتائج...</p>
+        </div>
+    </div>
+
+    <div id="question-overlay">
+        <div id="q-char-disp"></div>
+        <div id="q-text">جاري تحميل السؤال...</div>
+        <div id="player-buzzer-area" style="display:none;">
+            <button id="buzzer-btn" onclick="hitBuzzer()">🚀 اضغط!</button>
+            <h2 id="buzzer-msg" style="color:white; margin-top:20px;"></h2>
+        </div>
+        <div id="admin-buzzer-status" style="display:none; color:yellow; font-size:2rem; font-weight:bold; margin:20px 0;">انتظار الجرس...</div>
+        <div id="q-answer">الإجابة: ...</div>
+        <div id="admin-overlay-controls" style="display:none; margin-top:20px; background:rgba(0,0,0,0.3); padding:10px; border-radius:15px;">
+            <button class="btn-action" style="background: #fff; color:#333; font-size:0.9rem;" onclick="resetBuzzer()">🔄 فتح الجرس مجدداً</button>
+            <div style="display:flex; gap:5px; margin-top:10px; justify-content:center;">
+                <button class="btn-action" style="background: orange; color: black; width:auto;" onclick="toggleAnswer()">👁 الإجابة</button>
+                <button class="btn-action" style="background: var(--red); color: white; width:auto;" onclick="hideQuestionAndReturn()">🔙 إنهاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-modal">
+        <h1 id="adm-modal-char" style="font-size: 4rem; color: white;"></h1>
+        <div id="admin-q-selection" style="width:100%; margin-bottom:20px;"></div>
+        <hr style="width:80%; border-color:#fff; margin:20px 0;">
+        <h3 style="color:#fff; margin:0;">من الفائز بالحرف؟</h3>
+        <div style="display:flex; justify-content:center; width:100%;">
+            <button class="btn-action" style="background: var(--red); color: white; width:45%;" onclick="colorChar('red')">الأحمر</button>
+            <button class="btn-action" style="background: var(--green); color: white; width:45%;" onclick="colorChar('green')">الأخضر</button>
+        </div>
+        <button class="btn-action" style="background: #fff; color: #333; margin-top:20px;" onclick="closeAdminModal()">إلغاء</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDh4v9gRCICA_XRCJXsDpbtCySYAoFsfhk",
+            authDomain: "bagera-word.firebaseapp.com",
+            databaseURL: "https://bagera-word-default-rtdb.firebaseio.com",
+            projectId: "bagera-word",
+            storageBucket: "bagera-word.firebasestorage.app",
+            messagingSenderId: "53001885470",
+            appId: "1:53001885470:web:c6649f9f259824f747db0f"
+        };
+        try { if(firebase.apps.length === 0) firebase.initializeApp(firebaseConfig); else firebase.app(); } catch(e) {}
+        const db = firebase.database();
+
+        const questionsDB = {
+            "أ": {easy: {q:"حيوان مفترس يلقب بملك الغابة؟", a:"أسد"}, medium: {q:"ما هي أكبر قارات العالم؟", a:"آسيا"}, hard: {q:"صوت اشتعال النار وتوهجها؟", a:"أجيج"}},
+            "ب": {easy: {q:"طائر مائي لا يطير؟", a:"بطريق"}, medium: {q:"عاصمة العراق؟", a:"بغداد"}, hard: {q:"مرض جلدي يسبب بقع بيضاء؟", a:"بهاق"}},
+            "ت": {easy: {q:"فاكهة صيفية ذكرت في القرآن؟", a:"تين"}, medium: {q:"دولة عاصمتها بانكوك؟", a:"تايلاند"}, hard: {q:"دواء لإبطال السم؟", a:"ترياق"}},
+            "ث": {easy: {q:"حيوان مشهور بالمكر؟", a:"ثعلب"}, medium: {q:"غاز الزفير؟", a:"ثاني أكسيد الكربون"}, hard: {q:"معدن كيميائي (Th)؟", a:"ثوريوم"}},
+            "ج": {easy: {q:"سفينة الصحراء؟", a:"جمل"}, medium: {q:"الجبل الذي رست عليه سفينة نوح؟", a:"جودي"}, hard: {q:"علم طبقات الأرض؟", a:"جيولوجيا"}},
+            "ح": {easy: {q:"سائل أبيض مفيد للعظام؟", a:"حليب"}, medium: {q:"كائن يغير لونه؟", a:"حرباء"}, hard: {q:"صوت حركة أوراق الشجر؟", a:"حفيف"}},
+            "خ": {easy: {q:"خضار أخضر للسلطة؟", a:"خيار"}, medium: {q:"عاصمة السودان؟", a:"خرطوم"}, hard: {q:"صوت تدفق المياه؟", a:"خرير"}},
+            "د": {easy: {q:"طائر يوقظنا للفجر؟", a:"ديك"}, medium: {q:"عاصمة سوريا؟", a:"دمشق"}, hard: {q:"صوت مشي النمل؟", a:"دبيب"}},
+            "ذ": {easy: {q:"جزء خلفي للحيوانات؟", a:"ذيل"}, medium: {q:"معدن أصفر ثمين؟", a:"ذهب"}, hard: {q:"أعلى الشيء أو سنام الجمل؟", a:"ذروة"}},
+            "ر": {easy: {q:"فاكهة بحبوب حمراء؟", a:"رمان"}, medium: {q:"شهر الصيام؟", a:"رمضان"}, hard: {q:"العظام البالية؟", a:"رميم"}},
+            "ز": {easy: {q:"حيوان طويل الرقبة؟", a:"زرافة"}, medium: {q:"كوكب ذو حلقات؟", a:"زحل"}, hard: {q:"البرد الشديد؟", a:"زمهرير"}},
+            "س": {easy: {q:"وسيلة مواصلات بـ 4 عجلات؟", a:"سيارة"}, medium: {q:"سورة تعدل ثلث القرآن؟", a:"الإخلاص"}, hard: {q:"الغبار الكوني؟", a:"سديم"}},
+            "ش": {easy: {q:"نجم يضيء الأرض؟", a:"شمس"}, medium: {q:"شهر يلي رمضان؟", a:"شوال"}, hard: {q:"الرائحة الطيبة؟", a:"شذى"}},
+            "ص": {easy: {q:"الركن الثاني للإسلام؟", a:"صلاة"}, medium: {q:"طائر حاد البصر؟", a:"صقر"}, hard: {q:"اسم للسيف القاطع؟", a:"صارم"}},
+            "ض": {easy: {q:"حيوان يرمز له بالقفز؟", a:"ضفدع"}, medium: {q:"وقت اشتداد الحرارة؟", a:"ضحى"}, hard: {q:"من أسماء الأسد؟", a:"ضرغام"}},
+            "ط": {easy: {q:"وسيلة نقل جوية؟", a:"طائرة"}, medium: {q:"عاصمة اليابان؟", a:"طوكيو"}, hard: {q:"الجبل العظيم؟", a:"طود"}},
+            "ظ": {easy: {q:"جزء صلب بأطراف الأصابع؟", a:"ظفر"}, medium: {q:"حيوان يشبه الغزال؟", a:"ظبي"}, hard: {q:"المرأة في الهودج؟", a:"ظعينة"}},
+            "ع": {easy: {q:"عضو الإبصار؟", a:"عين"}, medium: {q:"عاصمة الأردن؟", a:"عمان"}, hard: {q:"اسم للذهب؟", a:"عسجد"}},
+            "غ": {easy: {q:"حيوان بعيون واسعة؟", a:"غزال"}, medium: {q:"طائر قابيل وهابيل؟", a:"غراب"}, hard: {q:"من أسماء الأسد؟", a:"غضنفر"}},
+            "ف": {easy: {q:"حيوان بخرطوم؟", a:"فيل"}, medium: {q:"سورة المانعة؟", a:"الفاتحة"}, hard: {q:"صوت الأفعى؟", a:"فحيح"}},
+            "ق": {easy: {q:"نكتب به؟", a:"قلم"}, medium: {q:"اتجاه الصلاة؟", a:"قبلة"}, hard: {q:"اسم للأسد في القرآن؟", a:"قسورة"}},
+            "ك": {easy: {q:"حيوان وفي؟", a:"كلب"}, medium: {q:"بناء مكعب بمكة؟", a:"كعبة"}, hard: {q:"النوم الخفيف؟", a:"كرى"}},
+            "ل": {easy: {q:"حمضيات صفراء؟", a:"ليمون"}, medium: {q:"دولة عاصمتها بيروت؟", a:"لبنان"}, hard: {q:"موج البحر الصاخب؟", a:"لجة"}},
+            "م": {easy: {q:"فاكهة يحبها القرد؟", a:"موز"}, medium: {q:"مدينة مولد النبي؟", a:"مكة"}, hard: {q:"السيف الهندي؟", a:"مهند"}},
+            "ن": {easy: {q:"حشرة نشيطة؟", a:"نملة"}, medium: {q:"حيوان مخطط؟", a:"نمر"}, hard: {q:"الذهب والفضة معاً؟", a:"نقدان"}},
+            "ه": {easy: {q:"شكل القمر أول الشهر؟", a:"هلال"}, medium: {q:"طائر سليمان؟", a:"هدهد"}, hard: {q:"صوت الرعد؟", a:"هزيم"}},
+            "و": {easy: {q:"نبات نهدي به؟", a:"ورد"}, medium: {q:"طائر ينام مقلوباً؟", a:"وطواط"}, hard: {q:"المطر الغزير؟", a:"وابل"}},
+            "ي": {easy: {q:"عضو نأكل به؟", a:"يد"}, medium: {q:"نبي الحوت؟", a:"يونس"}, hard: {q:"اسم للبحر؟", a:"يم"}}
+        };
+
+        const alphabet = "أبتثجحخدذرزسشصضطظعغفقكلمنهوي";
+        const urlParams = new URLSearchParams(window.location.search);
+        let roomId = urlParams.get('room');
+        let role = urlParams.get('role');
+        let selIdx = null; 
+
+        window.onload = function() {
+            if(role) { if(role === 'admin') initAdmin(); else initPlayer(); }
+            else if(roomId) {
+                document.getElementById('scr-setup').classList.remove('active');
+                document.getElementById('scr-connect').classList.add('active');
+                generateSafeQRs();
+                listenForAudioActions();
+            }
+        };
+
+        function fullReset() {
+            if(confirm("تحذير: سيتم إعادة اللعبة بالكامل وطرد جميع اللاعبين. هل أنت متأكد؟")) {
+                db.ref(`games/${roomId}`).set({ state: 'reset' });
+            }
+        }
+
+        function playAudio(type) {
+            if(confirm("هل تريد تشغيل الصوت في الشاشة الرئيسية؟")) {
+                db.ref(`games/${roomId}/action`).set({ type: type, ts: Date.now() });
+            }
+        }
+
+        function listenForAudioActions() {
+            db.ref(`games/${roomId}/action`).on('value', snap => {
+                const act = snap.val();
+                if(act && (Date.now() - act.ts < 5000)) {
+                    document.getElementById('audio-visual').style.display = 'block';
+                    let audioId = act.type === 'wrong' ? 'audio-wrong' : 'audio-rules';
+                    const audio = document.getElementById(audioId);
+                    audio.currentTime = 0;
+                    audio.play().catch(e => alert("انقر لتفعيل الصوت"));
+                    audio.onended = () => document.getElementById('audio-visual').style.display = 'none';
+                }
+            });
+        }
+
+        function generateSafeQRs() {
+            const baseUrl = window.location.href.split('?')[0];
+            const size = "150x150";
+            document.getElementById('qr-red-container').innerHTML = `<img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=${size}&data=${encodeURIComponent(baseUrl + `?room=${roomId}&role=red`)}" />`;
+            document.getElementById('qr-green-container').innerHTML = `<img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=${size}&data=${encodeURIComponent(baseUrl + `?room=${roomId}&role=green`)}" />`;
+            document.getElementById('qr-admin-container').innerHTML = `<img class="qr-img" style="width:70px;height:70px;" src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(baseUrl + `?room=${roomId}&role=admin`)}" />`;
+        }
+
+        function createGame() {
+            roomId = Math.random().toString(36).substr(2, 6);
+            const t1 = document.getElementById('t1').value || "الأحمر";
+            const t2 = document.getElementById('t2').value || "الأخضر";
+            let lets = alphabet.split('').sort(() => Math.random() - 0.5).slice(0, 28);
+            db.ref(`games/${roomId}`).set({ t1: t1, t2: t2, letters: lets, colors: {}, state: 1, timer: 0, activeQ: null })
+              .then(() => {
+                  const newUrl = window.location.href.split('?')[0] + `?room=${roomId}`;
+                  window.history.pushState({path:newUrl}, '', newUrl);
+                  document.getElementById('scr-setup').classList.remove('active');
+                  document.getElementById('scr-connect').classList.add('active');
+                  generateSafeQRs();
+                  listenForAudioActions();
+              });
+        }
+
+        function startGameDisplay() {
+            document.getElementById('scr-connect').classList.remove('active');
+            document.getElementById('scr-host').classList.add('active');
+            db.ref(`games/${roomId}`).on('value', s => {
+                const d = s.val(); if(!d) return;
+                
+                // إعادة الضبط الشاملة
+                if(d.state === 'reset') {
+                    window.location.href = window.location.pathname; // يعيد تحميل الصفحة بدون باراميترات
+                    return;
+                }
+
+                document.getElementById('lbl-t1').innerText = d.t1;
+                document.getElementById('lbl-t2').innerText = d.t2;
+                if(d.timer > 0) {
+                    let m = Math.floor(d.timer/60); let sec = d.timer%60;
+                    document.getElementById('timer-box').innerText = `${m}:${sec<10?'0'+sec:sec}`;
+                } else {
+                    document.getElementById('timer-box').innerText = d.timer === -1 ? "انتهى الوقت" : "00:00";
+                    if(d.timer === -1) document.getElementById('timer-box').style.color = "red";
+                }
+                const grid = document.getElementById('host-grid');
+                const waiting = document.getElementById('host-waiting');
+                const results = document.getElementById('host-results');
+                if(d.state === 1 || d.state === 2) {
+                    grid.style.display = 'grid'; waiting.style.display = 'none'; results.style.display = 'none';
+                    grid.innerHTML = '';
+                    d.letters.forEach((l, i) => {
+                        const div = document.createElement('div'); div.className = `letter-box ${d.colors?.[i] || ''}`; div.innerText = l;
+                        grid.appendChild(div);
+                    });
+                } else if (d.state === 3) {
+                    grid.style.display = 'none'; waiting.style.display = 'block'; results.style.display = 'none';
+                } else if (d.state === 4) {
+                    grid.style.display = 'none'; waiting.style.display = 'none'; results.style.display = 'flex';
+                    renderFinalResults(d);
+                }
+            });
+        }
+
+        function renderFinalResults(d) {
+            const rChars = document.getElementById('res-chars-red'); const gChars = document.getElementById('res-chars-green');
+            rChars.innerHTML = ''; gChars.innerHTML = '';
+            d.letters.forEach((l, i) => {
+                if(d.colors?.[i] === 'red') rChars.innerHTML += `<div class="tiny-letter">${l}</div>`;
+                if(d.colors?.[i] === 'green') gChars.innerHTML += `<div class="tiny-letter">${l}</div>`;
+            });
+            const rList = document.getElementById('list-red'); const gList = document.getElementById('list-green');
+            rList.innerHTML = ''; gList.innerHTML = '';
+            let rScore = 0; if(d.words && d.words.red) Object.values(d.words.red).forEach(wObj => { if(wObj.status === 'ok') { rList.innerHTML += `<div class="res-word approved"><span>${wObj.text}</span><span>✅</span></div>`; rScore++; } });
+            let gScore = 0; if(d.words && d.words.green) Object.values(d.words.green).forEach(wObj => { if(wObj.status === 'ok') { gList.innerHTML += `<div class="res-word approved"><span>${wObj.text}</span><span>✅</span></div>`; gScore++; } });
+            document.getElementById('score-red').innerText = rScore; document.getElementById('score-green').innerText = gScore;
+        }
+
+        function monitorQuestion() {
+            db.ref(`games/${roomId}/activeQ`).on('value', snap => {
+                const q = snap.val();
+                const overlay = document.getElementById('question-overlay');
+                if(q && q.visible) {
+                    overlay.style.display = 'flex';
+                    if(role === 'admin') {
+                        document.getElementById('q-char-disp').innerText = q.char;
+                        document.getElementById('q-text').innerText = q.text;
+                        document.getElementById('admin-overlay-controls').style.display = 'block';
+                        document.getElementById('player-buzzer-area').style.display = 'none';
+                        document.getElementById('admin-buzzer-status').style.display = 'block';
+                        if(q.buzzer) {
+                            const teamName = q.buzzer === 'red' ? "الأحمر" : "الأخضر";
+                            const teamColor = q.buzzer === 'red' ? "red" : "#2ed573";
+                            document.getElementById('admin-buzzer-status').innerHTML = `🔴 قام بالضغط: <span style="color:${teamColor}">${teamName}</span>`;
+                        } else {
+                            document.getElementById('admin-buzzer-status').innerText = "في انتظار ضغط الجرس...";
+                        }
+                        if(q.showAns) {
+                            document.getElementById('q-answer').style.display = 'block';
+                            document.getElementById('q-answer').innerText = "الإجابة: " + q.answer;
+                        } else {
+                            document.getElementById('q-answer').style.display = 'none';
+                        }
+                    } else if (role === 'red' || role === 'green') {
+                        document.getElementById('q-char-disp').innerText = q.char;
+                        document.getElementById('q-text').innerText = "استمع لسؤال المقدم 🎤";
+                        document.getElementById('admin-overlay-controls').style.display = 'none';
+                        document.getElementById('admin-buzzer-status').style.display = 'none';
+                        document.getElementById('q-answer').style.display = 'none';
+                        document.getElementById('player-buzzer-area').style.display = 'block';
+                        const btn = document.getElementById('buzzer-btn');
+                        const msg = document.getElementById('buzzer-msg');
+                        if(q.buzzer) {
+                            btn.disabled = true; btn.style.opacity = "0.3";
+                            if(q.buzzer === role) { msg.innerText = "🎉 لك الأحقية! جاوب"; msg.style.color = "#2ed573"; } 
+                            else { msg.innerText = "🔒 الفريق الآخر ضغط أولاً"; msg.style.color = "red"; }
+                        } else {
+                            btn.disabled = false; btn.style.opacity = "1"; msg.innerText = "";
+                        }
+                    } else {
+                        overlay.style.display = 'none';
+                    }
+                } else {
+                    overlay.style.display = 'none';
+                }
+            });
+        }
+
+        function initAdmin() {
+            document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-admin').classList.add('active');
+            monitorQuestion();
+            db.ref(`games/${roomId}`).on('value', s => {
+                const d = s.val(); if(!d) return;
+                
+                // إعادة الضبط
+                if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
+
+                if(d.state === 1) {
+                    const grid = document.getElementById('admin-grid'); grid.innerHTML = '';
+                    d.letters.forEach((l, i) => {
+                        const div = document.createElement('div'); div.className = `letter-box ${d.colors?.[i] || ''}`; div.innerText = l;
+                        div.onclick = () => openAdminModal(i, l); grid.appendChild(div);
+                    });
+                } else if(d.state === 2) {
+                    document.getElementById('admin-pre-game').style.display = 'none';
+                    document.getElementById('admin-p1').style.display = 'none'; document.getElementById('admin-p2').style.display = 'block';
+                } else if(d.state === 3) {
+                    document.getElementById('admin-p2').style.display = 'none'; document.getElementById('admin-p3').style.display = 'block';
+                    renderReviewPanel(d);
+                }
+            });
+        }
+        function renderReviewPanel(d) {
+            const rChars = document.getElementById('review-chars-red'); const gChars = document.getElementById('review-chars-green');
+            rChars.innerHTML = ''; gChars.innerHTML = '';
+            d.letters.forEach((l, i) => {
+                if(d.colors?.[i] === 'red') rChars.innerHTML += `<div class="tiny-letter">${l}</div>`;
+                if(d.colors?.[i] === 'green') gChars.innerHTML += `<div class="tiny-letter">${l}</div>`;
+            });
+            const rList = document.getElementById('review-list-red'); const gList = document.getElementById('review-list-green');
+            rList.innerHTML = ''; gList.innerHTML = '';
+            if(d.words && d.words.red) Object.entries(d.words.red).forEach(([key, val]) => {
+                rList.innerHTML += `<div class="res-word ${val.status === 'ok'?'approved':'rejected'}">${val.text}<div><button class="judge-btn btn-ok" onclick="judgeWord('red','${key}','ok')">✔</button><button class="judge-btn btn-no" onclick="judgeWord('red','${key}','bad')">✖</button></div></div>`;
+            });
+            if(d.words && d.words.green) Object.entries(d.words.green).forEach(([key, val]) => {
+                gList.innerHTML += `<div class="res-word ${val.status === 'ok'?'approved':'rejected'}">${val.text}<div><button class="judge-btn btn-ok" onclick="judgeWord('green','${key}','ok')">✔</button><button class="judge-btn btn-no" onclick="judgeWord('green','${key}','bad')">✖</button></div></div>`;
+            });
+        }
+        function judgeWord(team, key, status) { db.ref(`games/${roomId}/words/${team}/${key}/status`).set(status); }
+        function publishResults() { if(confirm("نشر النتائج؟")) db.ref(`games/${roomId}/state`).set(4); }
+        
+        function openAdminModal(i, char) {
+            selIdx = i; document.getElementById('adm-modal-char').innerText = char;
+            document.getElementById('admin-modal').style.display = 'flex';
+            const qData = questionsDB[char] || {easy:{q:"?",a:"?"}, medium:{q:"?",a:"?"}, hard:{q:"?",a:"?"}};
+            const container = document.getElementById('admin-q-selection');
+            container.innerHTML = `
+                <button class="q-select-btn" style="background:#00e676" onclick="triggerQuestion('easy', '${char}')">سهل: ${qData.easy.q}</button>
+                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
+                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard', '${char}')">صعب: ${qData.hard.q}</button>
+            `;
+        }
+        function triggerQuestion(diff, char) {
+            const qData = questionsDB[char][diff];
+            db.ref(`games/${roomId}/activeQ`).set({ visible: true, char: char, text: qData.q, answer: qData.a, showAns: false, buzzer: null });
+            document.getElementById('admin-modal').style.display = 'none';
+        }
+        function resetBuzzer() { db.ref(`games/${roomId}/activeQ/buzzer`).set(null); }
+        function toggleAnswer() { db.ref(`games/${roomId}/activeQ/showAns`).transaction(v => !v); }
+        function hideQuestionAndReturn() { db.ref(`games/${roomId}/activeQ`).set(null); document.getElementById('admin-modal').style.display = 'flex'; }
+        function colorChar(c) { db.ref(`games/${roomId}/colors/${selIdx}`).set(c); document.getElementById('admin-modal').style.display = 'none'; }
+        function closeAdminModal() { document.getElementById('admin-modal').style.display = 'none'; }
+        function setPhase(p) { if(confirm("تأكيد الانتقال؟")) db.ref(`games/${roomId}/state`).set(p); }
+        function startTimer() {
+            const mins = document.getElementById('custom-timer-input').value || 2; let t = mins * 60;
+            let int = setInterval(() => { t--; db.ref(`games/${roomId}/timer`).set(t); if(t <= 0) { clearInterval(int); stopTimer(); } }, 1000);
+        }
+        function stopTimer() { db.ref(`games/${roomId}/timer`).set(-1); db.ref(`games/${roomId}/state`).set(3); }
+
+        function initPlayer() {
+            document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-player').classList.add('active');
+            monitorQuestion();
+            document.getElementById('p-team-name').innerText = role === 'red' ? "الفريق الأحمر" : "الفريق الأخضر";
+            document.getElementById('p-team-name').style.color = role === 'red' ? "var(--red)" : "var(--green)";
+            db.ref(`games/${roomId}`).on('value', s => {
+                const d = s.val(); if(!d) return;
+                
+                // إعادة الضبط
+                if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
+
+                let myL = []; d.letters.forEach((l, i) => { if(d.colors?.[i] === role) myL.push(l); });
+                const html = myL.map(l => `<div class="tiny-letter">${l}</div>`).join('');
+                document.getElementById('p-letters').innerHTML = html || "لا يوجد حروف";
+                document.getElementById('p-letters-2').innerHTML = html;
+                if(d.state === 2) { document.getElementById('p-p1').style.display = 'none'; document.getElementById('p-p2').style.display = 'block'; }
+                else if(d.state >= 3) { document.getElementById('p-p2').style.display = 'none'; document.getElementById('p-p3').style.display = 'block'; }
+            });
+        }
+        function sendWord() {
+            const w = document.getElementById('word-in').value;
+            if(w) { db.ref(`games/${roomId}/words/${role}`).push({ text: w, status: 'ok' }); document.getElementById('word-in').value = ''; document.getElementById('sent-msg').innerText = "تم الإرسال!"; setTimeout(()=>document.getElementById('sent-msg').innerText='', 1500); }
+        }
+        function hitBuzzer() {
+            db.ref(`games/${roomId}/activeQ/buzzer`).transaction((currentVal) => {
+                if (currentVal === null) { return role; } else { return; } 
+            });
+        }
+    </script>
+</body>
+</html>

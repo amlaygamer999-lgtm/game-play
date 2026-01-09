@@ -24,10 +24,9 @@
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: absolute; top: 0; left: 0; z-index: 1; }
         .active { display: flex; }
 
-        /* --- الشاشة الأولى (الخلفية الجديدة) --- */
+        /* الشاشة الأولى */
         #scr-setup {
-            background-image: url('47493.jpg'); /* الصورة الجديدة */
-            background-size: cover; background-position: center; background-repeat: no-repeat;
+            background-image: url('47493.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;
             justify-content: flex-end; padding-bottom: 30px; 
         }
 
@@ -46,7 +45,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* --- مؤثر الخطأ (X) --- */
+        /* مؤثر الخطأ (X) */
         #wrong-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(100, 0, 0, 0.4); z-index: 10000;
@@ -125,13 +124,8 @@
         }
         .reset-btn-corner:hover { background: red; }
 
-        /* منطقة الكلمات التي كتبها اللاعب */
-        #my-submitted-list {
-            display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px;
-        }
-        .submitted-chip {
-            background: #4a148c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; border: 1px solid var(--secondary);
-        }
+        #my-submitted-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
+        .submitted-chip { background: #4a148c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; border: 1px solid var(--secondary); }
     </style>
 </head>
 <body>
@@ -195,13 +189,12 @@
     <div id="scr-admin" class="screen mobile-view">
         <h2 style="color:var(--bg-purple)">لوحة التحكم 🛠</h2>
         
-        <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px;">
-            <button style="background:#9c27b0; color:white; width:100%; border-radius:15px; padding:10px; margin-bottom:10px;" onclick="playAudio('rules')">📢 تشغيل الشرح</button>
-            <button style="background:#000; color:white; width:100%; border-radius:15px; padding:10px;" onclick="playAudio('wrong')">👎 تأثير الغلط (زر + صوت)</button>
-        </div>
-
         <div id="admin-p1">
-            <button style="background:#000; color:white; width:100%; border-radius:15px; padding:10px; margin-bottom:20px;" onclick="playAudio('wrong')">👎 تشغيل صوت الغلط</button>
+            <div style="display:flex; gap:10px; margin-bottom:15px; width:100%;">
+                <button style="background:#9c27b0; color:white; width:50%; border-radius:15px; padding:15px; font-size:1rem;" onclick="playAudio('rules')">📢 الشرح</button>
+                <button style="background:black; color:white; width:50%; border-radius:15px; padding:15px; font-size:1rem;" onclick="playAudio('wrong')">👎 تأثير خطأ</button>
+            </div>
+            
             <p>اضغط الحرف لاختيار السؤال:</p>
             <div id="admin-grid" class="grid-container" style="grid-template-columns: repeat(5, 1fr); zoom: 0.6;"></div>
             <button class="btn-start" onclick="setPhase(2)" style="width: 100%; margin-top: 20px;">الانتقال لمرحلة الكلمات</button>
@@ -274,7 +267,11 @@
 
     <div id="admin-modal">
         <h1 id="adm-modal-char" style="font-size: 4rem; color: white;"></h1>
+        
+        <button class="btn-action" style="background: black; color: white; margin-bottom: 20px; border: 2px solid red;" onclick="playAudio('wrong')">👎 تأثير خطأ سريع</button>
+
         <div id="admin-q-selection" style="width:100%; margin-bottom:20px;"></div>
+        
         <hr style="width:80%; border-color:#fff; margin:20px 0;">
         <h3 style="color:#fff; margin:0;">من الفائز بالحرف؟</h3>
         <div style="display:flex; justify-content:center; width:100%;">
@@ -355,7 +352,6 @@
         }
 
         function playAudio(type) {
-            // إذا كان "غلط"، نرسل الأمر فوراً
             db.ref(`games/${roomId}/action`).set({ type: type, ts: Date.now() });
         }
 
@@ -366,22 +362,16 @@
                     document.getElementById('audio-visual').style.display = 'block';
                     
                     if(act.type === 'wrong') {
-                        // تشغيل الصوت
                         const audio = document.getElementById('audio-wrong');
                         audio.currentTime = 0;
                         audio.play().catch(e => {});
-                        // تشغيل المؤثر البصري
                         showWrongVisual();
                     } else {
                         const audio = document.getElementById('audio-rules');
                         audio.currentTime = 0;
                         audio.play().catch(e => {});
                     }
-                    
-                    // إخفاء مؤشر الصوت بعد فترة
-                    setTimeout(() => {
-                        document.getElementById('audio-visual').style.display = 'none';
-                    }, 3000);
+                    setTimeout(() => { document.getElementById('audio-visual').style.display = 'none'; }, 3000);
                 }
             });
         }
@@ -389,9 +379,7 @@
         function showWrongVisual() {
             const overlay = document.getElementById('wrong-overlay');
             overlay.style.display = 'flex';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 2000); // يختفي بعد ثانيتين
+            setTimeout(() => { overlay.style.display = 'none'; }, 2000);
         }
 
         function generateSafeQRs() {
@@ -580,9 +568,9 @@
             const qData = questionsDB[char] || {medium:{q:"?",a:"?"}, hard1:{q:"?",a:"?"}, hard2:{q:"?",a:"?"}};
             const container = document.getElementById('admin-q-selection');
             container.innerHTML = `
-                <button class="q-select-btn" style="background:#00e676" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
-                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
-                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
+                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
+                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
+                <button class="q-select-btn" style="background:#b71c1c" onclick="triggerQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
             `;
         }
         function triggerQuestion(diff, char) {
@@ -605,14 +593,11 @@
         function initPlayer() {
             document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-player').classList.add('active');
             monitorQuestion();
-            // هنا لا نستطيع معرفة الاسم فوراً لأن البيانات لم تصل بعد، سنعتمد على التحديث في listener
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                // إعادة الضبط
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
 
-                // تحديث اسم الفريق
                 if(role === 'red') {
                     document.getElementById('p-team-name').innerText = d.t1;
                     document.getElementById('p-team-name').style.color = "var(--red)";
@@ -621,7 +606,6 @@
                     document.getElementById('p-team-name').style.color = "var(--green)";
                 }
 
-                // تحديث قائمة الكلمات المسجلة محلياً
                 const mySubmittedDiv = document.getElementById('my-submitted-list');
                 mySubmittedDiv.innerHTML = '';
                 mySubmittedWords = [];
@@ -644,7 +628,6 @@
             const w = document.getElementById('word-in').value.trim();
             if(!w) return;
             
-            // التحقق من التكرار
             if(mySubmittedWords.includes(w)) {
                 alert("⛔ لقد كتبت هذه الكلمة مسبقاً!");
                 return;

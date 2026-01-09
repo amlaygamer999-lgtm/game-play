@@ -24,14 +24,15 @@
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: absolute; top: 0; left: 0; z-index: 1; }
         .active { display: flex; }
 
-        /* الشاشة الأولى */
+        /* --- الشاشة الأولى (الخلفية الجديدة) --- */
         #scr-setup {
-            background-image: url('47267.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;
+            background-image: url('47493.jpg'); /* الصورة الجديدة */
+            background-size: cover; background-position: center; background-repeat: no-repeat;
             justify-content: flex-end; padding-bottom: 30px; 
         }
 
         .login-bar {
-            background: rgba(74, 20, 140, 0.85); width: 90%; max-width: 1100px; padding: 15px; border-radius: 50px;
+            background: rgba(74, 20, 140, 0.9); width: 90%; max-width: 1100px; padding: 15px; border-radius: 50px;
             border: 2px solid var(--primary); box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
             display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px;
         }
@@ -43,6 +44,31 @@
             background: var(--primary); color: #4a148c; border: none; padding: 10px 40px; font-size: 1.2rem;
             border-radius: 30px; cursor: pointer; font-weight: 900; white-space: nowrap; margin: 0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* --- مؤثر الخطأ (X) --- */
+        #wrong-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(100, 0, 0, 0.4); z-index: 10000;
+            justify-content: center; align-items: center;
+            animation: flashRed 0.5s;
+        }
+        .x-symbol {
+            font-size: 20rem; color: red; font-weight: bold;
+            text-shadow: 0 0 50px black; border: 10px solid red; border-radius: 50%;
+            width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake { 
+            10%, 90% { transform: translate3d(-5px, 0, 0); } 
+            20%, 80% { transform: translate3d(10px, 0, 0); } 
+            30%, 50%, 70% { transform: translate3d(-15px, 0, 0); } 
+            40%, 60% { transform: translate3d(15px, 0, 0); } 
+        }
+        @keyframes flashRed {
+            0% { background: rgba(255, 0, 0, 0.5); }
+            100% { background: rgba(100, 0, 0, 0.1); }
         }
 
         /* تنسيقات عامة */
@@ -98,9 +124,21 @@
             z-index: 9999; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
         }
         .reset-btn-corner:hover { background: red; }
+
+        /* منطقة الكلمات التي كتبها اللاعب */
+        #my-submitted-list {
+            display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px;
+        }
+        .submitted-chip {
+            background: #4a148c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; border: 1px solid var(--secondary);
+        }
     </style>
 </head>
 <body>
+
+    <div id="wrong-overlay">
+        <div class="x-symbol">✖</div>
+    </div>
 
     <div id="scr-setup" class="screen active">
         <div class="login-bar">
@@ -117,14 +155,8 @@
         
         <div id="audio-visual" class="audio-wave">🔊 جاري تشغيل الصوت...</div>
         <div class="qr-row">
-            <div class="qr-card">
-                <div id="qr-red-container"></div>
-                <h2 id="qr-name-red" style="color:var(--red); margin:5px 0;">الفريق الأحمر</h2>
-            </div>
-            <div class="qr-card">
-                <div id="qr-green-container"></div>
-                <h2 id="qr-name-green" style="color:var(--green); margin:5px 0;">الفريق الأخضر</h2>
-            </div>
+            <div class="qr-card"><div id="qr-red-container"></div><h2 id="qr-name-red" style="color:var(--red); margin:5px 0;">الفريق الأحمر</h2></div>
+            <div class="qr-card"><div id="qr-green-container"></div><h2 id="qr-name-green" style="color:var(--green); margin:5px 0;">الفريق الأخضر</h2></div>
         </div>
         <button class="btn-start" style="font-size:1.2rem; padding:10px 30px;" onclick="startGameDisplay()">الانتقال للوحة الحروف</button>
         <div style="position: absolute; bottom: 20px; left: 20px; background: white; padding: 10px; border-radius:15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
@@ -165,7 +197,7 @@
         
         <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px;">
             <button style="background:#9c27b0; color:white; width:100%; border-radius:15px; padding:10px; margin-bottom:10px;" onclick="playAudio('rules')">📢 تشغيل الشرح</button>
-            <button style="background:#000; color:white; width:100%; border-radius:15px; padding:10px;" onclick="playAudio('wrong')">👎 تأثير الغلط</button>
+            <button style="background:#000; color:white; width:100%; border-radius:15px; padding:10px;" onclick="playAudio('wrong')">👎 تأثير الغلط (زر + صوت)</button>
         </div>
 
         <div id="admin-p1">
@@ -211,7 +243,7 @@
         <div id="p-p2" style="display: none;">
             <img src="hurry.jpg" class="hurry-img" alt="اخلصوا بسرعة">
             <h3>أكتب كلماتك:</h3>
-            <div id="p-letters-2" class="team-letters-strip" style="background:white;"></div>
+            <div id="my-submitted-list"></div> <div id="p-letters-2" class="team-letters-strip" style="background:white;"></div>
             <input type="text" id="word-in" placeholder="كلمة...">
             <button class="btn-start" onclick="sendWord()">إرسال</button>
             <p id="sent-msg" style="color: var(--green); margin-top:10px;"></p>
@@ -265,39 +297,39 @@
         try { if(firebase.apps.length === 0) firebase.initializeApp(firebaseConfig); else firebase.app(); } catch(e) {}
         const db = firebase.database();
 
-        // متغيرات عالمية لتخزين أسماء الفرق
         let team1Name = "الفريق الأحمر";
         let team2Name = "الفريق الأخضر";
+        let mySubmittedWords = []; 
 
         const questionsDB = {
-            "أ": {easy: {q:"حيوان مفترس يلقب بملك الغابة؟", a:"أسد"}, medium: {q:"ما هي أكبر قارات العالم؟", a:"آسيا"}, hard: {q:"صوت اشتعال النار وتوهجها؟", a:"أجيج"}},
-            "ب": {easy: {q:"طائر مائي لا يطير؟", a:"بطريق"}, medium: {q:"عاصمة العراق؟", a:"بغداد"}, hard: {q:"مرض جلدي يسبب بقع بيضاء؟", a:"بهاق"}},
-            "ت": {easy: {q:"فاكهة صيفية ذكرت في القرآن؟", a:"تين"}, medium: {q:"دولة عاصمتها بانكوك؟", a:"تايلاند"}, hard: {q:"دواء لإبطال السم؟", a:"ترياق"}},
-            "ث": {easy: {q:"حيوان مشهور بالمكر؟", a:"ثعلب"}, medium: {q:"غاز الزفير؟", a:"ثاني أكسيد الكربون"}, hard: {q:"معدن كيميائي (Th)؟", a:"ثوريوم"}},
-            "ج": {easy: {q:"سفينة الصحراء؟", a:"جمل"}, medium: {q:"الجبل الذي رست عليه سفينة نوح؟", a:"جودي"}, hard: {q:"علم طبقات الأرض؟", a:"جيولوجيا"}},
-            "ح": {easy: {q:"سائل أبيض مفيد للعظام؟", a:"حليب"}, medium: {q:"كائن يغير لونه؟", a:"حرباء"}, hard: {q:"صوت حركة أوراق الشجر؟", a:"حفيف"}},
-            "خ": {easy: {q:"خضار أخضر للسلطة؟", a:"خيار"}, medium: {q:"عاصمة السودان؟", a:"خرطوم"}, hard: {q:"صوت تدفق المياه؟", a:"خرير"}},
-            "د": {easy: {q:"طائر يوقظنا للفجر؟", a:"ديك"}, medium: {q:"عاصمة سوريا؟", a:"دمشق"}, hard: {q:"صوت مشي النمل؟", a:"دبيب"}},
-            "ذ": {easy: {q:"جزء خلفي للحيوانات؟", a:"ذيل"}, medium: {q:"معدن أصفر ثمين؟", a:"ذهب"}, hard: {q:"أعلى الشيء أو سنام الجمل؟", a:"ذروة"}},
-            "ر": {easy: {q:"فاكهة بحبوب حمراء؟", a:"رمان"}, medium: {q:"شهر الصيام؟", a:"رمضان"}, hard: {q:"العظام البالية؟", a:"رميم"}},
-            "ز": {easy: {q:"حيوان طويل الرقبة؟", a:"زرافة"}, medium: {q:"كوكب ذو حلقات؟", a:"زحل"}, hard: {q:"البرد الشديد؟", a:"زمهرير"}},
-            "س": {easy: {q:"وسيلة مواصلات بـ 4 عجلات؟", a:"سيارة"}, medium: {q:"سورة تعدل ثلث القرآن؟", a:"الإخلاص"}, hard: {q:"الغبار الكوني؟", a:"سديم"}},
-            "ش": {easy: {q:"نجم يضيء الأرض؟", a:"شمس"}, medium: {q:"شهر يلي رمضان؟", a:"شوال"}, hard: {q:"الرائحة الطيبة؟", a:"شذى"}},
-            "ص": {easy: {q:"الركن الثاني للإسلام؟", a:"صلاة"}, medium: {q:"طائر حاد البصر؟", a:"صقر"}, hard: {q:"اسم للسيف القاطع؟", a:"صارم"}},
-            "ض": {easy: {q:"حيوان يرمز له بالقفز؟", a:"ضفدع"}, medium: {q:"وقت اشتداد الحرارة؟", a:"ضحى"}, hard: {q:"من أسماء الأسد؟", a:"ضرغام"}},
-            "ط": {easy: {q:"وسيلة نقل جوية؟", a:"طائرة"}, medium: {q:"عاصمة اليابان؟", a:"طوكيو"}, hard: {q:"الجبل العظيم؟", a:"طود"}},
-            "ظ": {easy: {q:"جزء صلب بأطراف الأصابع؟", a:"ظفر"}, medium: {q:"حيوان يشبه الغزال؟", a:"ظبي"}, hard: {q:"المرأة في الهودج؟", a:"ظعينة"}},
-            "ع": {easy: {q:"عضو الإبصار؟", a:"عين"}, medium: {q:"عاصمة الأردن؟", a:"عمان"}, hard: {q:"اسم للذهب؟", a:"عسجد"}},
-            "غ": {easy: {q:"حيوان بعيون واسعة؟", a:"غزال"}, medium: {q:"طائر قابيل وهابيل؟", a:"غراب"}, hard: {q:"من أسماء الأسد؟", a:"غضنفر"}},
-            "ف": {easy: {q:"حيوان بخرطوم؟", a:"فيل"}, medium: {q:"سورة المانعة؟", a:"الفاتحة"}, hard: {q:"صوت الأفعى؟", a:"فحيح"}},
-            "ق": {easy: {q:"نكتب به؟", a:"قلم"}, medium: {q:"اتجاه الصلاة؟", a:"قبلة"}, hard: {q:"اسم للأسد في القرآن؟", a:"قسورة"}},
-            "ك": {easy: {q:"حيوان وفي؟", a:"كلب"}, medium: {q:"بناء مكعب بمكة؟", a:"كعبة"}, hard: {q:"النوم الخفيف؟", a:"كرى"}},
-            "ل": {easy: {q:"حمضيات صفراء؟", a:"ليمون"}, medium: {q:"دولة عاصمتها بيروت؟", a:"لبنان"}, hard: {q:"موج البحر الصاخب؟", a:"لجة"}},
-            "م": {easy: {q:"فاكهة يحبها القرد؟", a:"موز"}, medium: {q:"مدينة مولد النبي؟", a:"مكة"}, hard: {q:"السيف الهندي؟", a:"مهند"}},
-            "ن": {easy: {q:"حشرة نشيطة؟", a:"نملة"}, medium: {q:"حيوان مخطط؟", a:"نمر"}, hard: {q:"الذهب والفضة معاً؟", a:"نقدان"}},
-            "ه": {easy: {q:"شكل القمر أول الشهر؟", a:"هلال"}, medium: {q:"طائر سليمان؟", a:"هدهد"}, hard: {q:"صوت الرعد؟", a:"هزيم"}},
-            "و": {easy: {q:"نبات نهدي به؟", a:"ورد"}, medium: {q:"طائر ينام مقلوباً؟", a:"وطواط"}, hard: {q:"المطر الغزير؟", a:"وابل"}},
-            "ي": {easy: {q:"عضو نأكل به؟", a:"يد"}, medium: {q:"نبي الحوت؟", a:"يونس"}, hard: {q:"اسم للبحر؟", a:"يم"}}
+            "أ": {medium: {q:"عاصمة اليونان؟", a:"أثينا"}, hard1: {q:"صوت غليان القدر؟", a:"أزيز"}, hard2: {q:"اسم من أسماء الأسد؟", a:"أسامة"}},
+            "ب": {medium: {q:"عاصمة العراق؟", a:"بغداد"}, hard1: {q:"اسم يطلق على الأرض البور التي لا نبات فيها؟", a:"بلقع"}, hard2: {q:"صوت البغل؟", a:"بغام"}},
+            "ت": {medium: {q:"فاكهة ذكرت في القرآن؟", a:"تين"}, hard1: {q:"معدن ثمين يستخدم في الصناعة؟", a:"تيتانيوم"}, hard2: {q:"صوت تكسر الزجاج؟", a:"تحطم"}},
+            "ث": {medium: {q:"حيوان ماكر؟", a:"ثعلب"}, hard1: {q:"اسم صوت الشاة؟", a:"ثغاء"}, hard2: {q:"اسم يطلق على التراب المبلل؟", a:"ثرى"}},
+            "ج": {medium: {q:"حيوان يلقب بسفينة الصحراء؟", a:"جمل"}, hard1: {q:"صوت الحصان؟", a:"جلجلة (أو جمح)"}, hard2: {q:"اسم يطلق على الصخر العظيم؟", a:"جلمود"}},
+            "ح": {medium: {q:"حيوان زاحف يغير لونه؟", a:"حرباء"}, hard1: {q:"صوت الأفعى؟", a:"حفيف (للحركة) أو حثيث"}, hard2: {q:"صوت الحمار منكر الأصوات؟", a:"حمحيح (خطأ، نهيق، لكن بحرف ح: حشرجة)"}},
+            "خ": {medium: {q:"عاصمة السودان؟", a:"خرطوم"}, hard1: {q:"صوت الماء؟", a:"خرير"}, hard2: {q:"صوت النائم؟", a:"خخير"}},
+            "د": {medium: {q:"عاصمة سوريا؟", a:"دمشق"}, hard1: {q:"صوت النحل؟", a:"دوي"}, hard2: {q:"صوت الأقدام؟", a:"دبيب"}},
+            "ذ": {medium: {q:"معدن أصفر ثمين؟", a:"ذهب"}, hard1: {q:"قمة الشيء؟", a:"ذروة"}, hard2: {q:"شدة الحر؟", a:"ذوبان (أو ذكاء النار)"}},
+            "ر": {medium: {q:"شهر الصيام؟", a:"رمضان"}, hard1: {q:"صوت الرعد؟", a:"رعد"}, hard2: {q:"بقايا العظام البالية؟", a:"رميم"}},
+            "ز": {medium: {q:"حيوان طويل الرقبة؟", a:"زرافة"}, hard1: {q:"صوت الأسد؟", a:"زئير"}, hard2: {q:"شدة البرد؟", a:"زمهرير"}},
+            "س": {medium: {q:"وسيلة مواصلات؟", a:"سيارة"}, hard1: {q:"الغبار الكوني؟", a:"سديم"}, hard2: {q:"بقايا السائل في الإناء؟", a:"سؤر"}},
+            "ش": {medium: {q:"نجم يضيء الأرض؟", a:"شمس"}, hard1: {q:"صوت الحمار؟", a:"شهيق"}, hard2: {q:"الرائحة الطيبة؟", a:"شذى"}},
+            "ص": {medium: {q:"طائر جارح؟", a:"صقر"}, hard1: {q:"صوت الريح؟", a:"صرصر"}, hard2: {q:"صوت السيوف؟", a:"صليل"}},
+            "ض": {medium: {q:"حيوان برمائي؟", a:"ضفدع"}, hard1: {q:"صوت النار؟", a:"ضرام"}, hard2: {q:"اسم من أسماء الأسد؟", a:"ضرغام"}},
+            "ط": {medium: {q:"عاصمة اليابان؟", a:"طوكيو"}, hard1: {q:"الجبل العظيم؟", a:"طود"}, hard2: {q:"صوت العود؟", a:"طنين"}},
+            "ظ": {medium: {q:"حيوان يشبه الغزال؟", a:"ظبي"}, hard1: {q:"وقت شدة الحر؟", a:"ظهيرة"}, hard2: {q:"المرأة في الهودج؟", a:"ظعينة"}},
+            "ع": {medium: {q:"عاصمة الأردن؟", a:"عمان"}, hard1: {q:"اسم للذهب؟", a:"عسجد"}, hard2: {q:"صوت الذئب؟", a:"عواء"}},
+            "غ": {medium: {q:"حيوان بري؟", a:"غزال"}, hard1: {q:"اسم للأسد؟", a:"غضنفر"}, hard2: {q:"صوت غليان الماء؟", a:"غطمطة"}},
+            "ف": {medium: {q:"حيوان ضخم؟", a:"فيل"}, hard1: {q:"صوت الأفعى؟", a:"فحيح"}, hard2: {q:"الصحراء الواسعة؟", a:"فلاة"}},
+            "ق": {medium: {q:"اتجاه الصلاة؟", a:"قبلة"}, hard1: {q:"اسم للأسد؟", a:"قسورة"}, hard2: {q:"صوت الدجاجة؟", a:"قرقرة"}},
+            "ك": {medium: {q:"قبلة المسلمين؟", a:"كعبة"}, hard1: {q:"النوم الخفيف؟", a:"كرى"}, hard2: {q:"الأرض الصلبة؟", a:"كدية"}},
+            "ل": {medium: {q:"عاصمة لبنان؟", a:"بيروت (خطأ، الجواب لبنان)"}, hard1: {q:"صوت السلاح؟", a:"لعلعة"}, hard2: {q:"معظم الشيء؟", a:"لجة"}},
+            "م": {medium: {q:"فاكهة صفراء؟", a:"موز"}, hard1: {q:"صوت القط؟", a:"مواء"}, hard2: {q:"السيف القاطع؟", a:"مهند"}},
+            "ن": {medium: {q:"حيوان مفترس؟", a:"نمر"}, hard1: {q:"صوت البوم؟", a:"نعيق"}, hard2: {q:"الذهب والفضة؟", a:"نقدان"}},
+            "ه": {medium: {q:"طائر سليمان؟", a:"هدهد"}, hard1: {q:"صوت الرعد؟", a:"هزيم"}, hard2: {q:"صوت الريح؟", a:"هبوب"}},
+            "و": {medium: {q:"طائر ينام مقلوباً؟", a:"وطواط"}, hard1: {q:"المطر الغزير؟", a:"وابل"}, hard2: {q:"صوت الحمام؟", a:"هديل (خطأ، بحرف الواو: ورشان - نوع حمام)"}},
+            "ي": {medium: {q:"نبي ابتلعه الحوت؟", a:"يونس"}, hard1: {q:"اسم للبحر؟", a:"يم"}, hard2: {q:"نبات اليقطين؟", a:"يقطين"}}
         };
 
         const alphabet = "أبتثجحخدذرزسشصضطظعغفقكلمنهوي";
@@ -323,9 +355,8 @@
         }
 
         function playAudio(type) {
-            if(confirm("هل تريد تشغيل الصوت في الشاشة الرئيسية؟")) {
-                db.ref(`games/${roomId}/action`).set({ type: type, ts: Date.now() });
-            }
+            // إذا كان "غلط"، نرسل الأمر فوراً
+            db.ref(`games/${roomId}/action`).set({ type: type, ts: Date.now() });
         }
 
         function listenForAudioActions() {
@@ -333,13 +364,34 @@
                 const act = snap.val();
                 if(act && (Date.now() - act.ts < 5000)) {
                     document.getElementById('audio-visual').style.display = 'block';
-                    let audioId = act.type === 'wrong' ? 'audio-wrong' : 'audio-rules';
-                    const audio = document.getElementById(audioId);
-                    audio.currentTime = 0;
-                    audio.play().catch(e => alert("انقر لتفعيل الصوت"));
-                    audio.onended = () => document.getElementById('audio-visual').style.display = 'none';
+                    
+                    if(act.type === 'wrong') {
+                        // تشغيل الصوت
+                        const audio = document.getElementById('audio-wrong');
+                        audio.currentTime = 0;
+                        audio.play().catch(e => {});
+                        // تشغيل المؤثر البصري
+                        showWrongVisual();
+                    } else {
+                        const audio = document.getElementById('audio-rules');
+                        audio.currentTime = 0;
+                        audio.play().catch(e => {});
+                    }
+                    
+                    // إخفاء مؤشر الصوت بعد فترة
+                    setTimeout(() => {
+                        document.getElementById('audio-visual').style.display = 'none';
+                    }, 3000);
                 }
             });
+        }
+
+        function showWrongVisual() {
+            const overlay = document.getElementById('wrong-overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 2000); // يختفي بعد ثانيتين
         }
 
         function generateSafeQRs() {
@@ -355,7 +407,6 @@
             const t1 = document.getElementById('t1').value || "الفريق الأحمر";
             const t2 = document.getElementById('t2').value || "الفريق الأخضر";
             
-            // تحديث الأسماء تحت الباركود فوراً
             document.getElementById('qr-name-red').innerText = t1;
             document.getElementById('qr-name-green').innerText = t2;
 
@@ -480,11 +531,8 @@
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                // حفظ الأسماء للاستخدام المحلي
                 team1Name = d.t1;
                 team2Name = d.t2;
-                
-                // تحديث الأزرار في مودال الأدمن
                 document.getElementById('btn-win-red').innerText = d.t1;
                 document.getElementById('btn-win-green').innerText = d.t2;
                 document.getElementById('adm-rev-t1').innerText = d.t1 + ":";
@@ -529,12 +577,12 @@
         function openAdminModal(i, char) {
             selIdx = i; document.getElementById('adm-modal-char').innerText = char;
             document.getElementById('admin-modal').style.display = 'flex';
-            const qData = questionsDB[char] || {easy:{q:"?",a:"?"}, medium:{q:"?",a:"?"}, hard:{q:"?",a:"?"}};
+            const qData = questionsDB[char] || {medium:{q:"?",a:"?"}, hard1:{q:"?",a:"?"}, hard2:{q:"?",a:"?"}};
             const container = document.getElementById('admin-q-selection');
             container.innerHTML = `
-                <button class="q-select-btn" style="background:#00e676" onclick="triggerQuestion('easy', '${char}')">سهل: ${qData.easy.q}</button>
-                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
-                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard', '${char}')">صعب: ${qData.hard.q}</button>
+                <button class="q-select-btn" style="background:#00e676" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
+                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
+                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
             `;
         }
         function triggerQuestion(diff, char) {
@@ -573,6 +621,17 @@
                     document.getElementById('p-team-name').style.color = "var(--green)";
                 }
 
+                // تحديث قائمة الكلمات المسجلة محلياً
+                const mySubmittedDiv = document.getElementById('my-submitted-list');
+                mySubmittedDiv.innerHTML = '';
+                mySubmittedWords = [];
+                if(d.words && d.words[role]) {
+                    Object.values(d.words[role]).forEach(w => {
+                        mySubmittedWords.push(w.text);
+                        mySubmittedDiv.innerHTML += `<span class="submitted-chip">${w.text}</span>`;
+                    });
+                }
+
                 let myL = []; d.letters.forEach((l, i) => { if(d.colors?.[i] === role) myL.push(l); });
                 const html = myL.map(l => `<div class="tiny-letter">${l}</div>`).join('');
                 document.getElementById('p-letters').innerHTML = html || "لا يوجد حروف";
@@ -582,8 +641,19 @@
             });
         }
         function sendWord() {
-            const w = document.getElementById('word-in').value;
-            if(w) { db.ref(`games/${roomId}/words/${role}`).push({ text: w, status: 'ok' }); document.getElementById('word-in').value = ''; document.getElementById('sent-msg').innerText = "تم الإرسال!"; setTimeout(()=>document.getElementById('sent-msg').innerText='', 1500); }
+            const w = document.getElementById('word-in').value.trim();
+            if(!w) return;
+            
+            // التحقق من التكرار
+            if(mySubmittedWords.includes(w)) {
+                alert("⛔ لقد كتبت هذه الكلمة مسبقاً!");
+                return;
+            }
+
+            db.ref(`games/${roomId}/words/${role}`).push({ text: w, status: 'ok' }); 
+            document.getElementById('word-in').value = ''; 
+            document.getElementById('sent-msg').innerText = "تم الإرسال!"; 
+            setTimeout(()=>document.getElementById('sent-msg').innerText='', 1500);
         }
         function hitBuzzer() {
             db.ref(`games/${roomId}/activeQ/buzzer`).transaction((currentVal) => {

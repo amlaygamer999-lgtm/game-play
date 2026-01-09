@@ -115,17 +115,14 @@
 
         .hurry-img { width: 100%; max-width: 400px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid var(--primary); }
 
-        .corner-btn {
-            position: fixed; top: 20px; 
+        .reset-btn-corner {
+            position: fixed; top: 20px; left: 20px;
+            background: rgba(255, 0, 0, 0.7); color: white;
             border: none; padding: 10px 20px; border-radius: 30px;
             cursor: pointer; font-size: 1rem; font-weight: bold;
             z-index: 9999; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
         }
-        .reset-btn { left: 20px; background: rgba(255, 0, 0, 0.7); color: white; }
-        .reset-btn:hover { background: red; }
-        
-        .back-qr-btn { right: 20px; background: rgba(33, 150, 243, 0.8); color: white; }
-        .back-qr-btn:hover { background: #2196F3; }
+        .reset-btn-corner:hover { background: red; }
 
         #my-submitted-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
         .submitted-chip { background: #4a148c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; border: 1px solid var(--secondary); }
@@ -168,9 +165,8 @@
     </div>
 
     <div id="scr-host" class="screen">
-        <button class="corner-btn reset-btn" onclick="fullReset()">🔄 إعادة اللعبة</button>
-        <button class="corner-btn back-qr-btn" onclick="toggleQR()">🔙 عرض الباركود</button>
-
+        <button class="reset-btn-corner" onclick="fullReset()">🔄 إعادة اللعبة</button>
+        
         <div id="host-qr-overlay">
             <h1 style="color:white; margin-bottom:20px;">امسح للكود للدخول</h1>
             <div class="qr-row">
@@ -210,7 +206,7 @@
         <h2 style="color:var(--bg-purple)">لوحة التحكم 🛠</h2>
         
         <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
-            <button style="background:#9c27b0; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('rules')">📢 تشغيل الشرح</button>
+            <button style="background:#9c27b0; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('rules')">📢 الشرح</button>
             <button style="background:#e91e63; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('stop')">⏹️ إيقاف</button>
         </div>
 
@@ -281,9 +277,7 @@
         <div id="admin-overlay-controls" style="display:none; margin-top:20px; background:rgba(0,0,0,0.3); padding:10px; border-radius:15px; width:95%;">
             
             <div id="admin-buzzer-actions" style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn-action" style="background: black; color: white; border: 2px solid red;" onclick="playAudio('wrong')">👎 إجابة خاطئة (تأثير)</button>
-                <button class="btn-action" style="background: orange; color: black;" onclick="toggleAnswer()">👁 إظهار الإجابة</button>
-            </div>
+                </div>
 
             <hr style="border-color:rgba(255,255,255,0.2); margin:15px 0;">
             
@@ -296,9 +290,6 @@
 
     <div id="admin-modal">
         <h1 id="adm-modal-char" style="font-size: 4rem; color: white;"></h1>
-        
-        <button class="btn-action" style="background: black; color: white; margin-bottom: 20px; border: 2px solid red;" onclick="playAudio('wrong')">👎 تأثير خطأ سريع</button>
-        
         <div id="admin-q-selection" style="width:100%; margin-bottom:20px;"></div>
         <hr style="width:80%; border-color:#fff; margin:20px 0;">
         <h3 style="color:#fff; margin:0;">من الفائز بالحرف؟</h3>
@@ -331,11 +322,11 @@
             "ب": {medium: {q:"عاصمة العراق؟", a:"بغداد"}, hard1: {q:"اسم يطلق على الأرض البور التي لا نبات فيها؟", a:"بلقع"}, hard2: {q:"صوت البغل؟", a:"بغام"}},
             "ت": {medium: {q:"فاكهة ذكرت في القرآن؟", a:"تين"}, hard1: {q:"معدن ثمين يستخدم في الصناعة؟", a:"تيتانيوم"}, hard2: {q:"صوت تكسر الزجاج؟", a:"تحطم"}},
             "ث": {medium: {q:"حيوان ماكر؟", a:"ثعلب"}, hard1: {q:"اسم صوت الشاة؟", a:"ثغاء"}, hard2: {q:"اسم يطلق على التراب المبلل؟", a:"ثرى"}},
-            "ج": {medium: {q:"حيوان يلقب بسفينة الصحراء؟", a:"جمل"}, hard1: {q:"صوت الحصان؟", a:"جلجلة"}, hard2: {q:"اسم يطلق على الصخر العظيم؟", a:"جلمود"}},
-            "ح": {medium: {q:"حيوان زاحف يغير لونه؟", a:"حرباء"}, hard1: {q:"صوت الأفعى؟", a:"حفيف"}, hard2: {q:"صوت الحمار منكر الأصوات؟", a:"حمحيح (حشرجة)"}},
+            "ج": {medium: {q:"حيوان يلقب بسفينة الصحراء؟", a:"جمل"}, hard1: {q:"صوت الحصان؟", a:"جلجلة (أو جمح)"}, hard2: {q:"اسم يطلق على الصخر العظيم؟", a:"جلمود"}},
+            "ح": {medium: {q:"حيوان زاحف يغير لونه؟", a:"حرباء"}, hard1: {q:"صوت الأفعى؟", a:"حفيف (للحركة) أو حثيث"}, hard2: {q:"صوت الحمار منكر الأصوات؟", a:"حمحيح (خطأ، نهيق، لكن بحرف ح: حشرجة)"}},
             "خ": {medium: {q:"عاصمة السودان؟", a:"خرطوم"}, hard1: {q:"صوت الماء؟", a:"خرير"}, hard2: {q:"صوت النائم؟", a:"خخير"}},
             "د": {medium: {q:"عاصمة سوريا؟", a:"دمشق"}, hard1: {q:"صوت النحل؟", a:"دوي"}, hard2: {q:"صوت الأقدام؟", a:"دبيب"}},
-            "ذ": {medium: {q:"معدن أصفر ثمين؟", a:"ذهب"}, hard1: {q:"قمة الشيء؟", a:"ذروة"}, hard2: {q:"شدة الحر؟", a:"ذوبان"}},
+            "ذ": {medium: {q:"معدن أصفر ثمين؟", a:"ذهب"}, hard1: {q:"قمة الشيء؟", a:"ذروة"}, hard2: {q:"شدة الحر؟", a:"ذوبان (أو ذكاء النار)"}},
             "ر": {medium: {q:"شهر الصيام؟", a:"رمضان"}, hard1: {q:"صوت الرعد؟", a:"رعد"}, hard2: {q:"بقايا العظام البالية؟", a:"رميم"}},
             "ز": {medium: {q:"حيوان طويل الرقبة؟", a:"زرافة"}, hard1: {q:"صوت الأسد؟", a:"زئير"}, hard2: {q:"شدة البرد؟", a:"زمهرير"}},
             "س": {medium: {q:"وسيلة مواصلات؟", a:"سيارة"}, hard1: {q:"الغبار الكوني؟", a:"سديم"}, hard2: {q:"بقايا السائل في الإناء؟", a:"سؤر"}},
@@ -349,7 +340,7 @@
             "ف": {medium: {q:"حيوان ضخم؟", a:"فيل"}, hard1: {q:"صوت الأفعى؟", a:"فحيح"}, hard2: {q:"الصحراء الواسعة؟", a:"فلاة"}},
             "ق": {medium: {q:"اتجاه الصلاة؟", a:"قبلة"}, hard1: {q:"اسم للأسد؟", a:"قسورة"}, hard2: {q:"صوت الدجاجة؟", a:"قرقرة"}},
             "ك": {medium: {q:"قبلة المسلمين؟", a:"كعبة"}, hard1: {q:"النوم الخفيف؟", a:"كرى"}, hard2: {q:"الأرض الصلبة؟", a:"كدية"}},
-            "ل": {medium: {q:"دولة عربية عاصمتها بيروت؟", a:"لبنان"}, hard1: {q:"صوت السلاح؟", a:"لعلعة"}, hard2: {q:"معظم الشيء؟", a:"لجة"}},
+            "ل": {medium: {q:"عاصمة لبنان؟", a:"بيروت (خطأ، الجواب لبنان)"}, hard1: {q:"صوت السلاح؟", a:"لعلعة"}, hard2: {q:"معظم الشيء؟", a:"لجة"}},
             "م": {medium: {q:"فاكهة صفراء؟", a:"موز"}, hard1: {q:"صوت القط؟", a:"مواء"}, hard2: {q:"السيف القاطع؟", a:"مهند"}},
             "ن": {medium: {q:"حيوان مفترس؟", a:"نمر"}, hard1: {q:"صوت البوم؟", a:"نعيق"}, hard2: {q:"الذهب والفضة؟", a:"نقدان"}},
             "ه": {medium: {q:"طائر سليمان؟", a:"هدهد"}, hard1: {q:"صوت الرعد؟", a:"هزيم"}, hard2: {q:"صوت الريح؟", a:"هبوب"}},
@@ -399,14 +390,14 @@
             db.ref(`games/${roomId}/action`).on('value', snap => {
                 const act = snap.val();
                 if(act && (Date.now() - act.ts < 5000)) {
-                    // أمر إيقاف الصوت
+                    // إذا الأمر إيقاف: نوقف كل شيء فوراً ولا نظهر أي شيء
                     if(act.type === 'stop') {
                         document.getElementById('audio-rules').pause();
                         document.getElementById('audio-rules').currentTime = 0;
                         document.getElementById('audio-wrong').pause();
                         document.getElementById('audio-wrong').currentTime = 0;
                         document.getElementById('audio-visual').style.display = 'none';
-                        return;
+                        return; // خروج لعدم تشغيل أي كود آخر
                     }
 
                     document.getElementById('audio-visual').style.display = 'block';
@@ -522,8 +513,6 @@
                     if(role === 'admin') {
                         document.getElementById('q-char-disp').innerText = q.char;
                         document.getElementById('q-text').innerText = q.text;
-                        
-                        // إظهار لوحة التحكم فوراً للمقدم
                         document.getElementById('admin-overlay-controls').style.display = 'block';
                         document.getElementById('player-buzzer-area').style.display = 'none';
                         document.getElementById('admin-buzzer-status').style.display = 'block';
@@ -532,8 +521,15 @@
                             const teamName = q.buzzer === 'red' ? team1Name : team2Name;
                             const teamColor = q.buzzer === 'red' ? "red" : "#2ed573";
                             document.getElementById('admin-buzzer-status').innerHTML = `🔴 قام بالضغط: <span style="color:${teamColor}">${teamName}</span>`;
+                            
+                            // حقن زر الخطأ هنا فقط (عند الضغط على الجرس)
+                            document.getElementById('admin-buzzer-actions').innerHTML = `
+                                <button class="btn-action" style="background: black; color: white; border: 2px solid red;" onclick="playAudio('wrong')">👎 إجابة خاطئة (تأثير)</button>
+                                <button class="btn-action" style="background: orange; color: black;" onclick="toggleAnswer()">👁 إظهار الإجابة الصحيحة</button>
+                            `;
                         } else {
                             document.getElementById('admin-buzzer-status').innerText = "في انتظار ضغط الجرس...";
+                            document.getElementById('admin-buzzer-actions').innerHTML = ''; // إخفاء الأزرار قبل الضغط
                         }
 
                         if(q.showAns) {
@@ -647,14 +643,11 @@
         function initPlayer() {
             document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-player').classList.add('active');
             monitorQuestion();
-            // هنا لا نستطيع معرفة الاسم فوراً لأن البيانات لم تصل بعد، سنعتمد على التحديث في listener
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                // إعادة الضبط
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
 
-                // تحديث اسم الفريق
                 if(role === 'red') {
                     document.getElementById('p-team-name').innerText = d.t1;
                     document.getElementById('p-team-name').style.color = "var(--red)";
@@ -663,7 +656,6 @@
                     document.getElementById('p-team-name').style.color = "var(--green)";
                 }
 
-                // تحديث قائمة الكلمات المسجلة محلياً
                 const mySubmittedDiv = document.getElementById('my-submitted-list');
                 mySubmittedDiv.innerHTML = '';
                 mySubmittedWords = [];
@@ -686,7 +678,6 @@
             const w = document.getElementById('word-in').value.trim();
             if(!w) return;
             
-            // التحقق من التكرار
             if(mySubmittedWords.includes(w)) {
                 alert("⛔ لقد كتبت هذه الكلمة مسبقاً!");
                 return;

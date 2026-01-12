@@ -11,8 +11,12 @@
 
     <style>
         :root { 
-            --primary: #ffeb3b; --secondary: #4fc3f7; --bg-purple: #4a148c; 
-            --red: #f44336; --green: #00e676; --text: #fff; 
+            --primary: #ffeb3b; /* أصفر */
+            --secondary: #4fc3f7; 
+            --bg-purple: #4a148c; /* بنفسجي */
+            --red: #f44336; 
+            --green: #00e676; 
+            --text: #fff; 
         }
 
         body { 
@@ -31,18 +35,52 @@
         }
 
         .login-bar {
-            background: rgba(74, 20, 140, 0.9); width: 90%; max-width: 1100px; padding: 15px; border-radius: 50px;
-            border: 2px solid var(--primary); box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            background: rgba(74, 20, 140, 0.95); width: 90%; max-width: 1100px; padding: 20px; border-radius: 50px;
+            border: 4px solid var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px;
         }
         .login-bar input {
-            background: rgba(255,255,255,0.95); border: none; border-radius: 30px; padding: 10px 20px;
-            font-size: 1.1rem; color: #4a148c; font-weight: bold; font-family: 'Tajawal'; width: 35%; text-align: center; margin: 0;
+            background: rgba(255,255,255,0.9); border: none; border-radius: 30px; padding: 15px 20px;
+            font-size: 1.2rem; color: #4a148c; font-weight: bold; font-family: 'Tajawal'; width: 35%; text-align: center; margin: 0;
         }
         .login-bar button {
-            background: var(--primary); color: #4a148c; border: none; padding: 10px 40px; font-size: 1.2rem;
+            background: var(--primary); color: #4a148c; border: none; padding: 15px 50px; font-size: 1.3rem;
             border-radius: 30px; cursor: pointer; font-weight: 900; white-space: nowrap; margin: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: transform 0.2s;
+        }
+        .login-bar button:active { transform: scale(0.95); }
+
+        /* تنسيقات شاشة الباركود (تم التعديل حسب الطلب) */
+        #scr-connect { 
+            justify-content: center; 
+            background: radial-gradient(circle, #6a1b9a 0%, #4a148c 100%); /* تدرج بنفسجي */
+        }
+        
+        .qr-row { display: flex; gap: 50px; margin-bottom: 40px; margin-top: 20px; }
+        
+        .qr-card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 30px; 
+            color: #4a148c; 
+            text-align: center; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            border: 5px solid var(--primary); /* إطار أصفر لتوحيد الهوية */
+            transform: scale(1);
+            transition: transform 0.3s;
+        }
+        .qr-card:hover { transform: scale(1.05); }
+
+        .qr-img { width: 200px; height: 200px; display: block; margin: 0 auto; }
+        
+        /* بطاقة المقدم الصغيرة */
+        .admin-qr-box {
+            position: absolute; bottom: 30px; left: 30px; 
+            background: rgba(255, 255, 255, 0.9); 
+            padding: 10px; border-radius: 20px; 
+            text-align: center; 
+            border: 3px solid var(--bg-purple);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
         }
 
         /* مؤثر الخطأ (X) */
@@ -71,7 +109,6 @@
         }
 
         /* تنسيقات عامة */
-        #scr-connect, #scr-host { justify-content: center; }
         .btn-action { width: 90%; margin: 8px auto; font-size: 1.1rem; padding: 15px; display: block; border-radius: 15px; cursor: pointer; border: none; font-weight: bold; }
 
         .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 20px; padding: 20px; }
@@ -90,10 +127,6 @@
         .mobile-view { padding: 20px; text-align: center; justify-content: flex-start; overflow-y: auto; background: #f3e5f5; color: #333; }
         #timer-box { font-size: 3.5rem; color: var(--primary); font-family: monospace; text-shadow: 2px 2px 0 #000; background: rgba(0,0,0,0.3); padding: 5px 30px; border-radius: 15px; }
         
-        .qr-row { display: flex; gap: 40px; margin-bottom: 30px; }
-        .qr-card { background: white; padding: 20px; border-radius: 20px; color: #4a148c; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .qr-img { width: 150px; height: 150px; display: block; }
-
         #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a148c; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 10px solid var(--primary); }
         #q-char-disp { font-size: 6rem; color: var(--primary); margin-bottom: 10px; text-shadow: 0 5px 0 #000; }
         #q-text { font-size: 2.2rem; margin-bottom: 20px; color: white; line-height: 1.4; font-weight: bold; }
@@ -106,7 +139,7 @@
         .judge-btn { border: none; border-radius: 5px; padding: 5px 12px; margin-left: 5px; cursor: pointer; font-size: 1.2rem; }
         .btn-ok { background: var(--green); color: white; }
         .btn-no { background: var(--red); color: white; }
-        .btn-start { background: var(--primary); color: #4a148c; border: 4px solid #fff; }
+        .btn-start { background: var(--primary); color: #4a148c; border: 4px solid #fff; padding: 10px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; }
 
         .audio-wave { display: none; font-size: 3rem; color: var(--primary); margin-bottom: 20px; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
@@ -184,18 +217,28 @@
     </div>
 
     <div id="scr-connect" class="screen">
-        <h1 style="color:var(--primary); font-size:3rem; margin-bottom:10px;">امسح للانضمام</h1>
+        <h1 style="color:var(--primary); font-size:3.5rem; margin-bottom:10px; text-shadow: 0 5px 10px rgba(0,0,0,0.5);">امسح للانضمام 📲</h1>
         <audio id="audio-rules" src="rules.mp3" preload="auto"></audio>
         <audio id="audio-wrong" src="wrong.mp3" preload="auto"></audio>
         
         <div id="audio-visual" class="audio-wave">🔊 جاري تشغيل الصوت...</div>
+        
         <div class="qr-row">
-            <div class="qr-card"><div id="qr-red-container"></div><h2 id="qr-name-red" style="color:var(--red); margin:5px 0;">الفريق الأحمر</h2></div>
-            <div class="qr-card"><div id="qr-green-container"></div><h2 id="qr-name-green" style="color:var(--green); margin:5px 0;">الفريق الأخضر</h2></div>
+            <div class="qr-card">
+                <div id="qr-red-container"></div>
+                <h2 id="qr-name-red" style="color:var(--red); margin:10px 0; font-weight:900;">الفريق الأحمر</h2>
+            </div>
+            <div class="qr-card">
+                <div id="qr-green-container"></div>
+                <h2 id="qr-name-green" style="color:var(--green); margin:10px 0; font-weight:900;">الفريق الأخضر</h2>
+            </div>
         </div>
-        <button class="btn-start" style="font-size:1.2rem; padding:10px 30px;" onclick="startGameDisplay()">الانتقال للوحة الحروف</button>
-        <div style="position: absolute; bottom: 20px; left: 20px; background: white; padding: 10px; border-radius:15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-            <div id="qr-admin-container"></div><small style="color:var(--bg-purple); font-weight:bold; display:block;">المقدم</small>
+        
+        <button class="btn-start" onclick="startGameDisplay()">الانتقال للوحة الحروف 🏁</button>
+        
+        <div class="admin-qr-box">
+            <div id="qr-admin-container"></div>
+            <small style="color:#4a148c; font-weight:bold; display:block; margin-top:5px;">المقدم (Admin)</small>
         </div>
     </div>
 
@@ -538,7 +581,6 @@
                         document.getElementById('host-buzzer-alert').style.display = 'none';
                     }
 
-                    // إظهار الإجابة على التلفزيون فقط إذا ضغط الأدمن على العين
                     if (d.activeQ.showAns) {
                         document.getElementById('host-q-answer-display').style.display = 'block';
                         document.getElementById('host-q-answer-display').innerText = "الإجابة: " + d.activeQ.answer;
@@ -590,7 +632,6 @@
                         document.getElementById('q-char-disp').innerText = q.char;
                         document.getElementById('q-text').innerText = q.text;
                         
-                        // --- الجديد: إظهار الإجابة للمقدم فوراً ---
                         document.getElementById('q-answer').style.display = 'block';
                         document.getElementById('q-answer').style.color = '#00e676';
                         document.getElementById('q-answer').innerText = "الإجابة: " + q.answer;

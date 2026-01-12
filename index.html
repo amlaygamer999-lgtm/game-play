@@ -11,21 +11,17 @@
 
     <style>
         :root { 
-            /* لوحة الألوان الجديدة: أسود وبنفسجي */
-            --neon-purple: #d500f9; /* بنفسجي فاتح مضيء */
-            --dark-purple: #4a148c; /* بنفسجي غامق */
-            --bg-black: #050505;    /* أسود */
-            --glass-black: rgba(20, 20, 20, 0.9); /* أسود زجاجي */
-            
-            --red: #ff1744; 
+            /* الألوان الأصلية (تمت استعادتها) */
+            --primary: #ffeb3b; 
+            --secondary: #4fc3f7; 
+            --bg-purple: #4a148c; 
+            --red: #f44336; 
             --green: #00e676; 
             --text: #fff; 
         }
 
         body { 
-            /* الخلفية المدمجة (أسود مع لمسة بنفسجي) */
-            background: linear-gradient(135deg, #000000 20%, #240046 100%);
-            color: var(--text); 
+            background-color: var(--bg-purple); color: var(--text); 
             font-family: 'Tajawal', sans-serif; margin: 0; height: 100vh; overflow: hidden; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
         }
@@ -38,185 +34,41 @@
             background-image: url('47493.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;
             justify-content: flex-end; padding-bottom: 30px; 
         }
-        /* إضافة طبقة سوداء خفيفة على صورة البداية لتناسب الثيم */
-        #scr-setup::before {
-            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.4); z-index: -1;
-        }
 
         .login-bar {
-            background: var(--glass-black); width: 90%; max-width: 1100px; padding: 20px; border-radius: 50px;
-            border: 3px solid var(--neon-purple); box-shadow: 0 0 20px rgba(213, 0, 249, 0.3); /* توهج بنفسجي */
+            background: rgba(74, 20, 140, 0.9); width: 90%; max-width: 1100px; padding: 15px; border-radius: 50px;
+            border: 2px solid var(--primary); box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
             display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px;
         }
         .login-bar input {
-            background: rgba(255,255,255,0.1); border: 2px solid var(--dark-purple); border-radius: 30px; padding: 15px 20px;
-            font-size: 1.2rem; color: #fff; font-weight: bold; font-family: 'Tajawal'; width: 35%; text-align: center; margin: 0;
+            background: rgba(255,255,255,0.95); border: none; border-radius: 30px; padding: 10px 20px;
+            font-size: 1.1rem; color: #4a148c; font-weight: bold; font-family: 'Tajawal'; width: 35%; text-align: center; margin: 0;
         }
-        .login-bar input::placeholder { color: #aaa; }
-        
         .login-bar button {
-            background: var(--neon-purple); color: white; border: none; padding: 15px 50px; font-size: 1.3rem;
+            background: var(--primary); color: #4a148c; border: none; padding: 10px 40px; font-size: 1.2rem;
             border-radius: 30px; cursor: pointer; font-weight: 900; white-space: nowrap; margin: 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .login-bar button:active { transform: scale(0.95); }
 
-        /* شاشة الباركود */
+        /* تنسيقات شاشة الباركود (الأصلية) */
         #scr-connect { justify-content: center; }
         
-        .qr-row { display: flex; gap: 50px; margin-bottom: 40px; margin-top: 20px; }
-        
-        .qr-card { 
-            background: var(--glass-black); 
-            padding: 25px; 
-            border-radius: 30px; 
-            color: white; 
-            text-align: center; 
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            border: 4px solid var(--neon-purple);
-            transform: scale(1);
-            transition: transform 0.3s;
-        }
-        .qr-card:hover { transform: scale(1.05); border-color: white; }
-
-        .qr-img { width: 200px; height: 200px; display: block; margin: 0 auto; filter: drop-shadow(0 0 5px white); }
-        
-        .admin-qr-box {
-            position: absolute; bottom: 30px; left: 30px; 
-            background: black; 
-            padding: 10px; border-radius: 20px; 
-            text-align: center; 
-            border: 2px solid var(--neon-purple);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-
-        /* تنسيقات عامة */
-        .btn-action { width: 90%; margin: 8px auto; font-size: 1.1rem; padding: 15px; display: block; border-radius: 15px; cursor: pointer; border: none; font-weight: bold; }
-
-        /* شبكة الحروف (تصميم نيون) */
-        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 20px; padding: 20px; }
-        
-        .letter-box { 
-            width: 80px; height: 80px; 
-            background: #111; /* خلفية سوداء */
-            color: var(--neon-purple); /* نص بنفسجي مضيء */
-            border-radius: 20px; display: flex; justify-content: center; align-items: center; 
-            font-size: 2.2rem; font-weight: 900; cursor: pointer; transition: 0.3s; 
-            border: 2px solid var(--dark-purple); 
-            box-shadow: 0 4px 0 #000; 
-        }
-        .letter-box:hover { border-color: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); }
-
-        .letter-box.red { background: var(--red); color: white; border-color: #b71c1c; box-shadow: 0 0 15px var(--red); }
-        .letter-box.green { background: var(--green); color: white; border-color: #1b5e20; box-shadow: 0 0 15px var(--green); }
-
-        /* النتائج */
-        .results-wrapper { display: flex; width: 100%; height: 80%; justify-content: space-around; align-items: flex-start; padding-top: 20px; overflow-y: auto; }
-        .res-col { width: 45%; background: rgba(0,0,0,0.6); border-radius: 20px; padding: 20px; min-height: 50%; display: flex; flex-direction: column; align-items: center; border: 2px solid rgba(255,255,255,0.1); }
-        .res-word { width: 100%; font-size: 1.3rem; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .res-word.approved { color: var(--green); font-weight: bold; }
-
-        .team-letters-strip { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 20px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; width: 100%; }
-        .tiny-letter { width: 35px; height: 35px; border-radius: 50%; background: #333; color: white; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: bold; border: 1px solid #555; }
-
-        /* شاشات الجوال (مقدم ولاعبين) */
-        .mobile-view { 
-            padding: 20px; text-align: center; justify-content: flex-start; overflow-y: auto; 
-            background: linear-gradient(180deg, #1a0033 0%, #000000 100%); /* خلفية الجوال */
-            color: #fff; 
-        }
-        
-        #timer-box { font-size: 3.5rem; color: var(--neon-purple); font-family: monospace; text-shadow: 0 0 10px var(--neon-purple); background: rgba(0,0,0,0.5); padding: 5px 30px; border-radius: 15px; border: 1px solid var(--dark-purple); }
-        
-        #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 4px solid var(--neon-purple); }
-        #q-char-disp { font-size: 6rem; color: var(--neon-purple); margin-bottom: 10px; text-shadow: 0 0 20px var(--neon-purple); }
-        #q-text { font-size: 2.2rem; margin-bottom: 20px; color: white; line-height: 1.4; font-weight: bold; }
-        #q-answer { font-size: 1.8rem; color: #fff; background: var(--green); padding: 10px 30px; border-radius: 50px; margin-top: 20px; display: none; box-shadow: 0 0 20px var(--green); }
-        
-        #buzzer-btn { width: 220px; height: 220px; border-radius: 50%; background: var(--red); color: white; font-size: 2.5rem; font-weight: bold; border: 8px solid white; box-shadow: 0 0 30px var(--red); margin-top: 20px; }
-        
-        /* لوحة التحكم للمقدم */
-        #admin-pre-game { background: rgba(20,20,20,0.8) !important; border: 1px solid var(--dark-purple); }
-        
-        #admin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
-        
-        .judge-btn { border: none; border-radius: 5px; padding: 5px 12px; margin-left: 5px; cursor: pointer; font-size: 1.2rem; }
-        .btn-ok { background: var(--green); color: white; }
-        .btn-no { background: var(--red); color: white; }
-        .btn-start { background: var(--neon-purple); color: white; border: none; padding: 10px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 0 10px var(--neon-purple); }
-
-        .audio-wave { display: none; font-size: 3rem; color: var(--neon-purple); margin-bottom: 20px; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-
-        .q-select-btn { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 10px; color: white; font-size: 1.1rem; text-align: right; cursor: pointer; }
-
-        .hurry-img { width: 100%; max-width: 400px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 0 20px var(--neon-purple); border: 2px solid var(--neon-purple); }
-
-        .corner-btn {
-            position: fixed; top: 20px; 
-            border: none; padding: 10px 20px; border-radius: 30px;
-            cursor: pointer; font-size: 1rem; font-weight: bold;
-            z-index: 9999; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-        }
-        .reset-btn { left: 20px; background: rgba(200, 0, 0, 0.8); color: white; }
-        .reset-btn:hover { background: red; }
-        
-        .back-qr-btn { right: 20px; background: rgba(33, 150, 243, 0.8); color: white; }
-        .back-qr-btn:hover { background: #2196F3; }
-
-        #my-submitted-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
-        .submitted-chip { background: #333; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; border: 1px solid var(--neon-purple); }
-        
-        #host-qr-overlay {
-            display: none; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.98); z-index: 500;
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-
-        /* --- تصميم شاشة عرض السؤال على التلفزيون --- */
-        #host-question-view {
-            display: none; /* مخفي افتراضياً */
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #000000 20%, #240046 100%); /* خلفية السؤال */
-            z-index: 200; /* فوق الشبكة */
-            flex-direction: column; justify-content: center; align-items: center;
-            padding: 40px; text-align: center; box-sizing: border-box;
-            animation: fadeIn 0.3s ease-out;
-        }
-        #host-q-text {
-            font-size: 4.5rem; color: var(--neon-purple); font-weight: 900; line-height: 1.3;
-            text-shadow: 0 0 30px var(--dark-purple); margin-bottom: 50px;
-            background: rgba(0,0,0,0.6); padding: 40px; border-radius: 30px;
-            border: 2px solid var(--neon-purple); box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
-        #host-buzzer-alert {
-            display: none; font-size: 4rem; color: #fff;
-            background: #d50000; padding: 20px 80px;
-            border-radius: 50px; border: 4px solid #fff;
-            box-shadow: 0 0 50px #d50000;
-            animation: pulse 0.5s infinite alternate;
-        }
-        
-        /* إجابة تظهر على التلفزيون عند الطلب فقط */
-        #host-q-answer-display {
-            display: none; font-size: 3rem; color: #00e676; margin-top: 20px;
-            background: rgba(0,0,0,0.9); padding: 15px 50px; border-radius: 30px;
-            border: 2px solid #00e676; box-shadow: 0 0 20px #00e676;
-        }
+        .qr-row { display: flex; gap: 40px; margin-bottom: 30px; }
+        .qr-card { background: white; padding: 20px; border-radius: 20px; color: #4a148c; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .qr-img { width: 150px; height: 150px; display: block; }
 
         /* مؤثر الخطأ (X) */
         #wrong-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(50, 0, 0, 0.6); z-index: 10000;
+            background: rgba(100, 0, 0, 0.4); z-index: 10000;
             justify-content: center; align-items: center;
             animation: flashRed 0.5s;
         }
         .x-symbol {
-            font-size: 25rem; color: red; font-weight: 900;
-            text-shadow: 0 0 50px black; border: 15px solid red; border-radius: 50%;
-            width: 350px; height: 350px; display: flex; justify-content: center; align-items: center;
-            background: black; box-shadow: 0 0 50px red;
+            font-size: 20rem; color: red; font-weight: bold;
+            text-shadow: 0 0 50px black; border: 10px solid red; border-radius: 50%;
+            width: 300px; height: 300px; display: flex; justify-content: center; align-items: center;
+            background: rgba(255, 255, 255, 0.9);
             animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
         @keyframes shake { 
@@ -227,10 +79,113 @@
         }
         @keyframes flashRed {
             0% { background: rgba(255, 0, 0, 0.5); }
-            100% { background: rgba(50, 0, 0, 0.2); }
+            100% { background: rgba(100, 0, 0, 0.1); }
+        }
+
+        /* تنسيقات عامة */
+        .btn-action { width: 90%; margin: 8px auto; font-size: 1.1rem; padding: 15px; display: block; border-radius: 15px; cursor: pointer; border: none; font-weight: bold; }
+
+        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 20px; padding: 20px; }
+        .letter-box { width: 80px; height: 80px; background: #fff; color: #4a148c; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; font-weight: 900; cursor: pointer; transition: 0.3s; border: 4px solid #ddd; box-shadow: 0 5px 0 #bbb; }
+        .letter-box.red { background: var(--red); color: white; border-color: #d32f2f; box-shadow: 0 5px 0 #b71c1c; }
+        .letter-box.green { background: var(--green); color: white; border-color: #388e3c; box-shadow: 0 5px 0 #2e7d32; }
+
+        .results-wrapper { display: flex; width: 100%; height: 80%; justify-content: space-around; align-items: flex-start; padding-top: 20px; overflow-y: auto; }
+        .res-col { width: 45%; background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; min-height: 50%; display: flex; flex-direction: column; align-items: center; border: 2px solid rgba(255,255,255,0.2); }
+        .res-word { width: 100%; font-size: 1.3rem; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .res-word.approved { color: #69f0ae; font-weight: bold; }
+
+        .team-letters-strip { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; width: 100%; }
+        .tiny-letter { width: 35px; height: 35px; border-radius: 50%; background: #fff; color: #4a148c; display: flex; justify-content: center; align-items: center; font-size: 1rem; font-weight: bold; }
+
+        .mobile-view { padding: 20px; text-align: center; justify-content: flex-start; overflow-y: auto; background: #f3e5f5; color: #333; }
+        #timer-box { font-size: 3.5rem; color: var(--primary); font-family: monospace; text-shadow: 2px 2px 0 #000; background: rgba(0,0,0,0.3); padding: 5px 30px; border-radius: 15px; }
+        
+        /* شاشات الجوال والمقدم */
+        #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a148c; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 10px solid var(--primary); }
+        #q-char-disp { font-size: 6rem; color: var(--primary); margin-bottom: 10px; text-shadow: 0 5px 0 #000; }
+        #q-text { font-size: 2.2rem; margin-bottom: 20px; color: white; line-height: 1.4; font-weight: bold; }
+        
+        /* تنسيق الإجابة في جوال المقدم */
+        #q-answer { 
+            display: none; /* يظهر بالكود */
+            font-size: 1.8rem; color: #fff; 
+            background: var(--green); padding: 10px 30px; 
+            border-radius: 50px; margin-top: 20px; 
+            border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        #buzzer-btn { width: 220px; height: 220px; border-radius: 50%; background: #f44336; color: white; font-size: 2.5rem; font-weight: bold; border: 8px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.4); margin-top: 20px; }
+        
+        #admin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 20, 140, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
+        
+        .judge-btn { border: none; border-radius: 5px; padding: 5px 12px; margin-left: 5px; cursor: pointer; font-size: 1.2rem; }
+        .btn-ok { background: var(--green); color: white; }
+        .btn-no { background: var(--red); color: white; }
+        .btn-start { background: var(--primary); color: #4a148c; border: 4px solid #fff; padding: 10px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; cursor: pointer; }
+
+        .audio-wave { display: none; font-size: 3rem; color: var(--primary); margin-bottom: 20px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+
+        .q-select-btn { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 10px; color: white; font-size: 1.1rem; text-align: right; cursor: pointer; }
+
+        .hurry-img { width: 100%; max-width: 400px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid var(--primary); }
+
+        .corner-btn {
+            position: fixed; top: 20px; 
+            border: none; padding: 10px 20px; border-radius: 30px;
+            cursor: pointer; font-size: 1rem; font-weight: bold;
+            z-index: 9999; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        }
+        .reset-btn { left: 20px; background: rgba(255, 0, 0, 0.7); color: white; }
+        .reset-btn:hover { background: red; }
+        
+        .back-qr-btn { right: 20px; background: rgba(33, 150, 243, 0.8); color: white; }
+        .back-qr-btn:hover { background: #2196F3; }
+
+        #my-submitted-list { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 10px; }
+        .submitted-chip { background: #4a148c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.9rem; border: 1px solid var(--secondary); }
+        
+        #host-qr-overlay {
+            display: none; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.9); z-index: 500;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        /* --- شاشة التلفزيون (Host) --- */
+        #host-question-view {
+            display: none; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(74, 20, 140, 0.98); 
+            z-index: 200; 
+            flex-direction: column; justify-content: center; align-items: center;
+            padding: 40px; text-align: center; box-sizing: border-box;
+            animation: fadeIn 0.3s ease-out;
+        }
+        #host-q-text {
+            font-size: 4.5rem; color: #ffeb3b; font-weight: 900; line-height: 1.3;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8); margin-bottom: 50px;
+            background: rgba(0,0,0,0.3); padding: 30px; border-radius: 30px;
+            border: 4px solid white;
+        }
+        #host-buzzer-alert {
+            display: none; font-size: 4rem; color: #fff;
+            background: #d50000; padding: 20px 80px;
+            border-radius: 50px; border: 8px solid #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: pulse 0.5s infinite alternate;
+        }
+        
+        /* تنسيق الإجابة على شاشة التلفزيون */
+        #host-q-answer-display {
+            display: none; font-size: 3.5rem; color: #fff; margin-top: 30px;
+            background: #00e676; padding: 15px 60px; border-radius: 50px;
+            border: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes popUp { from { transform: scale(0); } to { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -248,28 +203,18 @@
     </div>
 
     <div id="scr-connect" class="screen">
-        <h1 style="color:var(--neon-purple); font-size:3.5rem; margin-bottom:10px; text-shadow: 0 0 15px var(--dark-purple);">امسح للانضمام 📲</h1>
+        <h1 style="color:var(--primary); font-size:3rem; margin-bottom:10px;">امسح للانضمام</h1>
         <audio id="audio-rules" src="rules.mp3" preload="auto"></audio>
         <audio id="audio-wrong" src="wrong.mp3" preload="auto"></audio>
         
         <div id="audio-visual" class="audio-wave">🔊 جاري تشغيل الصوت...</div>
-        
         <div class="qr-row">
-            <div class="qr-card">
-                <div id="qr-red-container"></div>
-                <h2 id="qr-name-red" style="color:var(--red); margin:10px 0; font-weight:900; text-shadow: 0 0 10px #500;">الفريق الأحمر</h2>
-            </div>
-            <div class="qr-card">
-                <div id="qr-green-container"></div>
-                <h2 id="qr-name-green" style="color:var(--green); margin:10px 0; font-weight:900; text-shadow: 0 0 10px #050;">الفريق الأخضر</h2>
-            </div>
+            <div class="qr-card"><div id="qr-red-container"></div><h2 id="qr-name-red" style="color:var(--red); margin:5px 0;">الفريق الأحمر</h2></div>
+            <div class="qr-card"><div id="qr-green-container"></div><h2 id="qr-name-green" style="color:var(--green); margin:5px 0;">الفريق الأخضر</h2></div>
         </div>
-        
-        <button class="btn-start" onclick="startGameDisplay()">الانتقال للوحة الحروف 🏁</button>
-        
-        <div class="admin-qr-box">
-            <div id="qr-admin-container"></div>
-            <small style="color:var(--neon-purple); font-weight:bold; display:block; margin-top:5px;">المقدم (Admin)</small>
+        <button class="btn-start" style="font-size:1.2rem; padding:10px 30px;" onclick="startGameDisplay()">الانتقال للوحة الحروف</button>
+        <div style="position: absolute; bottom: 20px; left: 20px; background: white; padding: 10px; border-radius:15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            <div id="qr-admin-container"></div><small style="color:var(--bg-purple); font-weight:bold; display:block;">المقدم</small>
         </div>
     </div>
 
@@ -286,8 +231,8 @@
             <button class="btn-start" onclick="toggleQR()">إخفاء الباركود ❌</button>
         </div>
 
-        <div style="width: 100%; display: flex; justify-content: space-between; padding: 20px 50px; box-sizing: border-box; font-size: 2.5rem; font-weight: 900; text-shadow: 0 0 10px rgba(0,0,0,0.8);">
-            <span style="color: #ff5252" id="lbl-t1">الأحمر</span>
+        <div style="width: 100%; display: flex; justify-content: space-between; padding: 20px 50px; box-sizing: border-box; font-size: 2.5rem; font-weight: 900; text-shadow: 2px 2px 5px rgba(0,0,0,0.3);">
+            <span style="color: #ff8a80" id="lbl-t1">الأحمر</span>
             <div id="timer-box">00:00</div>
             <span style="color: #69f0ae" id="lbl-t2">الأخضر</span>
         </div>
@@ -297,11 +242,10 @@
         <div id="host-question-view">
             <h1 id="host-q-text">جاري تحميل السؤال...</h1>
             <div id="host-buzzer-alert">🚨 الفريق الأحمر ضغط!</div>
-            <div id="host-q-answer-display"></div>
-        </div>
+            <div id="host-q-answer-display"></div> </div>
 
         <div id="host-waiting" style="display:none; margin-top:50px; text-align: center;">
-            <h1 style="font-size: 4rem; color: var(--neon-purple);">⏳</h1>
+            <h1 style="font-size: 4rem; color: var(--primary);">⏳</h1>
             <h2>الحكم يقوم بمراجعة الإجابات...</h2>
         </div>
         <div id="host-results" class="results-wrapper" style="display: none;">
@@ -321,11 +265,11 @@
     </div>
 
     <div id="scr-admin" class="screen mobile-view">
-        <h2 style="color:var(--neon-purple); text-shadow: 0 0 10px black;">لوحة التحكم 🛠</h2>
+        <h2 style="color:var(--bg-purple)">لوحة التحكم 🛠</h2>
         
-        <div id="admin-pre-game" style="background:rgba(30,30,30,0.9); padding:15px; border-radius:15px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; border: 1px solid #444;">
-            <button style="background:#7b1fa2; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('rules')">📢 الشرح</button>
-            <button style="background:#c2185b; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('stop')">⏹️ إيقاف</button>
+        <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
+            <button style="background:#9c27b0; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('rules')">📢 الشرح</button>
+            <button style="background:#e91e63; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('stop')">⏹️ إيقاف</button>
         </div>
 
         <div id="admin-p1">
@@ -336,9 +280,9 @@
 
         <div id="admin-p2" style="display: none;">
             <h3>المرحلة 2: الكلمات</h3>
-            <div style="background: #222; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #444;">
+            <div style="background: white; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
                 <label>الوقت (دقائق):</label>
-                <input type="number" id="custom-timer-input" value="2" style="width: 60px; border:1px solid #555; background:#000; color:white; padding:5px;">
+                <input type="number" id="custom-timer-input" value="2" style="width: 60px; border:1px solid #ccc;">
                 <button style="background: orange; border-radius:10px; padding:5px 15px; font-size:1rem;" onclick="startTimer()">ابدأ</button>
             </div>
             <button style="background: var(--red); width: 90%; padding:15px; border-radius:10px; color:white;" onclick="stopTimer()">إنهاء الوقت (إيقاف التسجيل)</button>
@@ -346,12 +290,12 @@
 
         <div id="admin-p3" style="display: none;">
             <h3>🧐 التحكيم</h3>
-            <div style="border: 2px solid var(--red); background:#222; padding:10px; margin-bottom:10px; border-radius:10px;">
+            <div style="border: 2px solid var(--red); background:white; padding:10px; margin-bottom:10px; border-radius:10px;">
                 <h4 id="adm-rev-t1" style="color:var(--red); margin:0;">الأحمر:</h4>
                 <div id="review-chars-red" class="team-letters-strip"></div>
                 <div id="review-list-red"></div>
             </div>
-            <div style="border: 2px solid var(--green); background:#222; padding:10px; margin-bottom:10px; border-radius:10px;">
+            <div style="border: 2px solid var(--green); background:white; padding:10px; margin-bottom:10px; border-radius:10px;">
                 <h4 id="adm-rev-t2" style="color:var(--green); margin:0;">الأخضر:</h4>
                 <div id="review-chars-green" class="team-letters-strip"></div>
                 <div id="review-list-green"></div>
@@ -364,15 +308,15 @@
         <h2 id="p-team-name">فريقي</h2>
         <div id="p-p1">
             <h3>حروفنا:</h3>
-            <div id="p-letters" class="team-letters-strip" style="background:#222;"></div>
-            <p style="color:#aaa;">انتظر السؤال...</p>
+            <div id="p-letters" class="team-letters-strip" style="background:white;"></div>
+            <p style="color:#666;">انتظر السؤال...</p>
         </div>
         <div id="p-p2" style="display: none;">
             <img src="hurry.jpg" class="hurry-img" alt="اخلصوا بسرعة">
             <h3>أكتب كلماتك:</h3>
             <div id="my-submitted-list"></div>
-            <div id="p-letters-2" class="team-letters-strip" style="background:#222;"></div>
-            <input type="text" id="word-in" placeholder="كلمة..." style="background:#333; color:white; border:none; padding:10px;">
+            <div id="p-letters-2" class="team-letters-strip" style="background:white;"></div>
+            <input type="text" id="word-in" placeholder="كلمة...">
             <button class="btn-start" onclick="sendWord()">إرسال</button>
             <p id="sent-msg" style="color: var(--green); margin-top:10px;"></p>
         </div>
@@ -389,15 +333,16 @@
             <button id="buzzer-btn" onclick="hitBuzzer()">🚀 اضغط!</button>
             <h2 id="buzzer-msg" style="color:white; margin-top:20px;"></h2>
         </div>
-        <div id="admin-buzzer-status" style="display:none; color:var(--neon-purple); font-size:2rem; font-weight:bold; margin:20px 0; text-shadow:0 0 10px purple;">انتظار الجرس...</div>
-        <div id="q-answer">الإجابة: ...</div>
+        <div id="admin-buzzer-status" style="display:none; color:yellow; font-size:2rem; font-weight:bold; margin:20px 0;">انتظار الجرس...</div>
         
-        <div id="admin-overlay-controls" style="display:none; margin-top:20px; background:rgba(20,20,20,0.9); padding:10px; border-radius:15px; width:95%; border:1px solid #555;">
+        <div id="q-answer" style="display:none; font-size:1.8rem; color:#fff; background:var(--green); padding:10px 30px; border-radius:50px; margin-top:20px; border:3px solid white; box-shadow:0 5px 15px rgba(0,0,0,0.3);">الإجابة: ...</div>
+        
+        <div id="admin-overlay-controls" style="display:none; margin-top:20px; background:rgba(0,0,0,0.3); padding:10px; border-radius:15px; width:95%;">
             <div id="admin-buzzer-actions" style="display:flex; flex-direction:column; gap:10px;">
                 <button class="btn-action" style="background: black; color: white; border: 2px solid red;" onclick="playAudio('wrong')">👎 إجابة خاطئة (تأثير)</button>
-                <button class="btn-action" style="background: orange; color: black;" onclick="toggleAnswer()">👁 إظهار الإجابة (تلفزيون)</button>
+                <button class="btn-action" style="background: orange; color: black;" onclick="toggleAnswer()">👁 إظهار الإجابة (للمشاهدين)</button>
             </div>
-            <hr style="border-color:#555; margin:15px 0;">
+            <hr style="border-color:rgba(255,255,255,0.2); margin:15px 0;">
             <div style="display:flex; gap:5px; justify-content:center;">
                 <button class="btn-action" style="background: #fff; color:#333; font-size:0.9rem;" onclick="resetBuzzer()">🔄 فتح الجرس</button>
                 <button class="btn-action" style="background: var(--red); color: white; width:auto;" onclick="hideQuestionAndReturn()">🔙 إنهاء</button>
@@ -406,10 +351,10 @@
     </div>
 
     <div id="admin-modal">
-        <h1 id="adm-modal-char" style="font-size: 4rem; color: var(--neon-purple);"></h1>
+        <h1 id="adm-modal-char" style="font-size: 4rem; color: white;"></h1>
         <button class="btn-action" style="background: black; color: white; margin-bottom: 20px; border: 2px solid red;" onclick="playAudio('wrong')">👎 تأثير خطأ سريع</button>
         <div id="admin-q-selection" style="width:100%; margin-bottom:20px;"></div>
-        <hr style="width:80%; border-color:#555; margin:20px 0;">
+        <hr style="width:80%; border-color:#fff; margin:20px 0;">
         <h3 style="color:#fff; margin:0;">من الفائز بالحرف؟</h3>
         <div style="display:flex; justify-content:center; width:100%;">
             <button id="btn-win-red" class="btn-action" style="background: var(--red); color: white; width:45%;" onclick="colorChar('red')">الأحمر</button>
@@ -664,8 +609,9 @@
                         document.getElementById('q-char-disp').innerText = q.char;
                         document.getElementById('q-text').innerText = q.text;
                         
+                        // إظهار الإجابة للمقدم فوراً (سرية)
                         document.getElementById('q-answer').style.display = 'block';
-                        document.getElementById('q-answer').style.color = '#00e676';
+                        document.getElementById('q-answer').style.color = '#fff';
                         document.getElementById('q-answer').innerText = "الإجابة: " + q.answer;
                         
                         document.getElementById('admin-overlay-controls').style.display = 'block';
@@ -760,9 +706,9 @@
             const qData = questionsDB[char] || {medium:{q:"?",a:"?"}, hard1:{q:"?",a:"?"}, hard2:{q:"?",a:"?"}};
             const container = document.getElementById('admin-q-selection');
             container.innerHTML = `
-                <button class="q-select-btn" style="background:var(--neon-purple); color:white; box-shadow:0 0 10px var(--neon-purple);" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
-                <button class="q-select-btn" style="background:#ff9800; color:black;" onclick="triggerQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
-                <button class="q-select-btn" style="background:#f44336; color:white;" onclick="triggerQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
+                <button class="q-select-btn" style="background:#00e676" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
+                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
+                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
             `;
         }
         function triggerQuestion(diff, char) {
@@ -777,7 +723,7 @@
         function colorChar(c) {
             let updates = {};
             updates[`games/${roomId}/colors/${selIdx}`] = c;
-            updates[`games/${roomId}/activeQ`] = null; 
+            updates[`games/${roomId}/activeQ`] = null; // إخفاء السؤال والعودة للشبكة
             db.ref().update(updates);
             document.getElementById('admin-modal').style.display = 'none'; 
         }
@@ -793,11 +739,14 @@
         function initPlayer() {
             document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-player').classList.add('active');
             monitorQuestion();
+            // هنا لا نستطيع معرفة الاسم فوراً لأن البيانات لم تصل بعد، سنعتمد على التحديث في listener
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
+                // إعادة الضبط
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
 
+                // تحديث اسم الفريق
                 if(role === 'red') {
                     document.getElementById('p-team-name').innerText = d.t1;
                     document.getElementById('p-team-name').style.color = "var(--red)";
@@ -806,6 +755,7 @@
                     document.getElementById('p-team-name').style.color = "var(--green)";
                 }
 
+                // تحديث قائمة الكلمات المسجلة محلياً
                 const mySubmittedDiv = document.getElementById('my-submitted-list');
                 mySubmittedDiv.innerHTML = '';
                 mySubmittedWords = [];
@@ -828,6 +778,7 @@
             const w = document.getElementById('word-in').value.trim();
             if(!w) return;
             
+            // التحقق من التكرار
             if(mySubmittedWords.includes(w)) {
                 alert("⛔ لقد كتبت هذه الكلمة مسبقاً!");
                 return;

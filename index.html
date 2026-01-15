@@ -594,42 +594,40 @@
             db.ref(`games/${roomId}/action`).on('value', snap => {
                 const act = snap.val();
                 if(act && (Date.now() - act.ts < 5000)) {
+                    
+                    // إيقاف الأصوات
                     if(act.type === 'stop') {
-                        document.getElementById('audio-rules').pause();
-                        document.getElementById('audio-rules').currentTime = 0;
-                        document.getElementById('audio-wrong').pause();
-                        document.getElementById('audio-wrong').currentTime = 0;
-                        document.getElementById('audio-buzzer').pause();
-                        document.getElementById('audio-buzzer').currentTime = 0;
-                        
-                        // إيقاف الأصوات الجديدة
-                        const audRemove = document.getElementById('audio-remove');
-                        const audSpit = document.getElementById('audio-spit');
-                        if(audRemove) { audRemove.pause(); audRemove.currentTime = 0; }
-                        if(audSpit) { audSpit.pause(); audSpit.currentTime = 0; }
-
+                        ['audio-rules', 'audio-wrong', 'audio-buzzer', 'audio-remove', 'audio-spit'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if(el) { el.pause(); el.currentTime = 0; }
+                        });
                         document.getElementById('audio-visual').style.display = 'none';
                         return;
                     }
 
                     document.getElementById('audio-visual').style.display = 'block';
                     
+                    // منطق التشغيل مع إظهار علامة الخطأ
                     if(act.type === 'wrong') {
                         const audio = document.getElementById('audio-wrong');
-                        audio.currentTime = 0;
-                        audio.play().catch(e => {});
+                        if(audio) { audio.currentTime = 0; audio.play().catch(e=>{}); }
                         showWrongVisual();
-                    } else if (act.type === 'rules') {
-                        const audio = document.getElementById('audio-rules');
-                        audio.currentTime = 0;
-                        audio.play().catch(e => {});
-                    } else if (act.type === 'remove') {
+                    } 
+                    else if (act.type === 'remove') {
                         const audio = document.getElementById('audio-remove');
-                        if(audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
-                    } else if (act.type === 'spit') {
+                        if(audio) { audio.currentTime = 0; audio.play().catch(e=>{}); }
+                        showWrongVisual(); // إضافة علامة الخطأ للصوت
+                    } 
+                    else if (act.type === 'spit') {
                         const audio = document.getElementById('audio-spit');
-                        if(audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
+                        if(audio) { audio.currentTime = 0; audio.play().catch(e=>{}); }
+                        showWrongVisual(); // إضافة علامة الخطأ للصوت
                     }
+                    else if (act.type === 'rules') {
+                        const audio = document.getElementById('audio-rules');
+                        if(audio) { audio.currentTime = 0; audio.play().catch(e=>{}); }
+                    }
+
                     setTimeout(() => { document.getElementById('audio-visual').style.display = 'none'; }, 3000);
                 }
             });

@@ -11,7 +11,6 @@
 
     <style>
         :root { 
-            /* الألوان الأصلية (تمت استعادتها) */
             --primary: #ffeb3b; 
             --secondary: #4fc3f7; 
             --bg-purple: #4a148c; 
@@ -50,9 +49,8 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* تنسيقات شاشة الباركود (الأصلية) */
+        /* تنسيقات شاشة الباركود */
         #scr-connect { justify-content: center; }
-        
         .qr-row { display: flex; gap: 40px; margin-bottom: 30px; }
         .qr-card { background: white; padding: 20px; border-radius: 20px; color: #4a148c; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         .qr-img { width: 150px; height: 150px; display: block; }
@@ -77,10 +75,7 @@
             30%, 50%, 70% { transform: translate3d(-15px, 0, 0); } 
             40%, 60% { transform: translate3d(15px, 0, 0); } 
         }
-        @keyframes flashRed {
-            0% { background: rgba(255, 0, 0, 0.5); }
-            100% { background: rgba(100, 0, 0, 0.1); }
-        }
+        @keyframes flashRed { 0% { background: rgba(255, 0, 0, 0.5); } 100% { background: rgba(100, 0, 0, 0.1); } }
 
         /* تنسيقات عامة */
         .btn-action { width: 90%; margin: 8px auto; font-size: 1.1rem; padding: 15px; display: block; border-radius: 15px; cursor: pointer; border: none; font-weight: bold; }
@@ -101,24 +96,27 @@
         .mobile-view { padding: 20px; text-align: center; justify-content: flex-start; overflow-y: auto; background: #f3e5f5; color: #333; }
         #timer-box { font-size: 3.5rem; color: var(--primary); font-family: monospace; text-shadow: 2px 2px 0 #000; background: rgba(0,0,0,0.3); padding: 5px 30px; border-radius: 15px; }
         
-        /* شاشات الجوال والمقدم */
         #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a148c; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 10px solid var(--primary); }
         #q-char-disp { font-size: 6rem; color: var(--primary); margin-bottom: 10px; text-shadow: 0 5px 0 #000; }
         #q-text { font-size: 2.2rem; margin-bottom: 20px; color: white; line-height: 1.4; font-weight: bold; }
         
-        /* تنسيق الإجابة في جوال المقدم */
-        #q-answer { 
-            display: none; /* يظهر بالكود */
-            font-size: 1.8rem; color: #fff; 
-            background: var(--green); padding: 10px 30px; 
-            border-radius: 50px; margin-top: 20px; 
-            border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        /* زر الجرس في شاشة اللاعب */
+        #player-buzzer-container {
+            margin-top: 30px; width: 100%; display: flex; flex-direction: column; align-items: center;
         }
-        
-        #buzzer-btn { width: 220px; height: 220px; border-radius: 50%; background: #f44336; color: white; font-size: 2.5rem; font-weight: bold; border: 8px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.4); margin-top: 20px; }
-        
+        #buzzer-btn { 
+            width: 250px; height: 250px; border-radius: 50%; 
+            background: #f44336; color: white; 
+            font-size: 3rem; font-weight: 900; 
+            border: 10px solid white; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4); 
+            cursor: pointer; transition: transform 0.1s;
+        }
+        #buzzer-btn:active { transform: scale(0.95); }
+        #buzzer-status-msg { margin-top: 20px; font-size: 1.5rem; font-weight: bold; color: #4a148c; }
+
+        /* التحكم للمقدم */
         #admin-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(74, 20, 140, 0.95); z-index: 2000; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
-        
         .judge-btn { border: none; border-radius: 5px; padding: 5px 12px; margin-left: 5px; cursor: pointer; font-size: 1.2rem; }
         .btn-ok { background: var(--green); color: white; }
         .btn-no { background: var(--red); color: white; }
@@ -152,40 +150,28 @@
             flex-direction: column; justify-content: center; align-items: center;
         }
 
-        /* --- شاشة التلفزيون (Host) --- */
-        #host-question-view {
-            display: none; 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(74, 20, 140, 0.98); 
-            z-index: 200; 
-            flex-direction: column; justify-content: center; align-items: center;
-            padding: 40px; text-align: center; box-sizing: border-box;
-            animation: fadeIn 0.3s ease-out;
-        }
-        #host-q-text {
-            font-size: 4.5rem; color: #ffeb3b; font-weight: 900; line-height: 1.3;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8); margin-bottom: 50px;
-            background: rgba(0,0,0,0.3); padding: 30px; border-radius: 30px;
-            border: 4px solid white;
-        }
+        /* --- تنبيه الجرس فقط (يظهر فوق الشبكة) --- */
         #host-buzzer-alert {
-            display: none; font-size: 4rem; color: #fff;
-            background: #d50000; padding: 20px 80px;
-            border-radius: 50px; border: 8px solid #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none; 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5rem; color: #fff;
+            background: #d50000; padding: 40px 100px;
+            border-radius: 60px; border: 10px solid #fff;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            z-index: 1000; 
             animation: pulse 0.5s infinite alternate;
+            white-space: nowrap;
         }
+        @keyframes pulse { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.1); } }
         
-        /* تنسيق الإجابة على شاشة التلفزيون */
-        #host-q-answer-display {
-            display: none; font-size: 3.5rem; color: #fff; margin-top: 30px;
-            background: #00e676; padding: 15px 60px; border-radius: 50px;
-            border: 5px solid white; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* زر تصفير الجرس للمقدم */
+        #admin-reset-buzzer {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #fff; color: #333; padding: 15px 40px; 
+            border-radius: 30px; font-size: 1.2rem; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 2px solid var(--red);
+            z-index: 2001; cursor: pointer; display: none; /* يظهر للمقدم فقط */
         }
-
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        @keyframes popUp { from { transform: scale(0); } to { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -206,6 +192,7 @@
         <h1 style="color:var(--primary); font-size:3rem; margin-bottom:10px;">امسح للانضمام</h1>
         <audio id="audio-rules" src="rules.mp3" preload="auto"></audio>
         <audio id="audio-wrong" src="wrong.mp3" preload="auto"></audio>
+        <audio id="audio-buzzer" src="buzzer.mp3" preload="auto"></audio>
         
         <div id="audio-visual" class="audio-wave">🔊 جاري تشغيل الصوت...</div>
         <div class="qr-row">
@@ -239,10 +226,7 @@
         
         <div id="host-grid" class="grid-container"></div>
 
-        <div id="host-question-view">
-            <h1 id="host-q-text">جاري تحميل السؤال...</h1>
-            <div id="host-buzzer-alert">🚨 الفريق الأحمر ضغط!</div>
-            <div id="host-q-answer-display"></div> </div>
+        <div id="host-buzzer-alert">🚨 الفريق الأحمر ضغط!</div>
 
         <div id="host-waiting" style="display:none; margin-top:50px; text-align: center;">
             <h1 style="font-size: 4rem; color: var(--primary);">⏳</h1>
@@ -273,7 +257,7 @@
         </div>
 
         <div id="admin-p1">
-            <p>اضغط الحرف لاختيار السؤال:</p>
+            <p>اضغط الحرف لاختيار السؤال (لك أنت فقط):</p>
             <div id="admin-grid" class="grid-container" style="grid-template-columns: repeat(5, 1fr); zoom: 0.6;"></div>
             <button class="btn-start" onclick="setPhase(2)" style="width: 100%; margin-top: 20px;">الانتقال لمرحلة الكلمات</button>
         </div>
@@ -302,6 +286,8 @@
             </div>
             <button style="background: var(--secondary); color:white; width: 100%; padding:15px; border-radius:10px;" onclick="publishResults()">📺 نشر النتائج</button>
         </div>
+        
+        <button id="admin-reset-buzzer" onclick="resetGlobalBuzzer()">🔄 تصفير الجرس</button>
     </div>
 
     <div id="scr-player" class="screen mobile-view">
@@ -309,7 +295,11 @@
         <div id="p-p1">
             <h3>حروفنا:</h3>
             <div id="p-letters" class="team-letters-strip" style="background:white;"></div>
-            <p style="color:#666;">انتظر السؤال...</p>
+            
+            <div id="player-buzzer-container">
+                <button id="buzzer-btn" onclick="hitBuzzer()">🚀 اضغط!</button>
+                <div id="buzzer-status-msg"></div>
+            </div>
         </div>
         <div id="p-p2" style="display: none;">
             <img src="hurry.jpg" class="hurry-img" alt="اخلصوا بسرعة">
@@ -326,34 +316,14 @@
         </div>
     </div>
 
-    <div id="question-overlay">
-        <div id="q-char-disp"></div>
-        <div id="q-text">جاري تحميل السؤال...</div>
-        <div id="player-buzzer-area" style="display:none;">
-            <button id="buzzer-btn" onclick="hitBuzzer()">🚀 اضغط!</button>
-            <h2 id="buzzer-msg" style="color:white; margin-top:20px;"></h2>
-        </div>
-        <div id="admin-buzzer-status" style="display:none; color:yellow; font-size:2rem; font-weight:bold; margin:20px 0;">انتظار الجرس...</div>
-        
-        <div id="q-answer" style="display:none; font-size:1.8rem; color:#fff; background:var(--green); padding:10px 30px; border-radius:50px; margin-top:20px; border:3px solid white; box-shadow:0 5px 15px rgba(0,0,0,0.3);">الإجابة: ...</div>
-        
-        <div id="admin-overlay-controls" style="display:none; margin-top:20px; background:rgba(0,0,0,0.3); padding:10px; border-radius:15px; width:95%;">
-            <div id="admin-buzzer-actions" style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn-action" style="background: black; color: white; border: 2px solid red;" onclick="playAudio('wrong')">👎 إجابة خاطئة (تأثير)</button>
-                <button class="btn-action" style="background: orange; color: black;" onclick="toggleAnswer()">👁 إظهار الإجابة (للمشاهدين)</button>
-            </div>
-            <hr style="border-color:rgba(255,255,255,0.2); margin:15px 0;">
-            <div style="display:flex; gap:5px; justify-content:center;">
-                <button class="btn-action" style="background: #fff; color:#333; font-size:0.9rem;" onclick="resetBuzzer()">🔄 فتح الجرس</button>
-                <button class="btn-action" style="background: var(--red); color: white; width:auto;" onclick="hideQuestionAndReturn()">🔙 إنهاء</button>
-            </div>
-        </div>
-    </div>
-
     <div id="admin-modal">
         <h1 id="adm-modal-char" style="font-size: 4rem; color: white;"></h1>
-        <button class="btn-action" style="background: black; color: white; margin-bottom: 20px; border: 2px solid red;" onclick="playAudio('wrong')">👎 تأثير خطأ سريع</button>
         <div id="admin-q-selection" style="width:100%; margin-bottom:20px;"></div>
+        
+        <div id="adm-q-answer" style="display:none; color:var(--green); font-size:1.5rem; background:white; padding:10px; margin-bottom:20px; border-radius:10px; text-align:center; width:90%;"></div>
+
+        <button class="btn-action" style="background: black; color: white; margin-bottom: 20px; border: 2px solid red;" onclick="playAudio('wrong')">👎 تأثير خطأ سريع</button>
+        
         <hr style="width:80%; border-color:#fff; margin:20px 0;">
         <h3 style="color:#fff; margin:0;">من الفائز بالحرف؟</h3>
         <div style="display:flex; justify-content:center; width:100%;">
@@ -379,6 +349,7 @@
         let team1Name = "الفريق الأحمر";
         let team2Name = "الفريق الأخضر";
         let mySubmittedWords = []; 
+        let lastBuzzer = null; 
 
         const questionsDB = {
             "أ": {medium: {q:"عاصمة اليونان؟", a:"أثينا"}, hard1: {q:"صوت غليان القدر؟", a:"أزيز"}, hard2: {q:"اسم من أسماء الأسد؟", a:"أسامة"}},
@@ -458,6 +429,8 @@
                         document.getElementById('audio-rules').currentTime = 0;
                         document.getElementById('audio-wrong').pause();
                         document.getElementById('audio-wrong').currentTime = 0;
+                        document.getElementById('audio-buzzer').pause();
+                        document.getElementById('audio-buzzer').currentTime = 0;
                         document.getElementById('audio-visual').style.display = 'none';
                         return;
                     }
@@ -502,7 +475,7 @@
             document.getElementById('qr-name-green').innerText = t2;
 
             let lets = alphabet.split('').sort(() => Math.random() - 0.5).slice(0, 28);
-            db.ref(`games/${roomId}`).set({ t1: t1, t2: t2, letters: lets, colors: {}, state: 1, timer: 0, activeQ: null })
+            db.ref(`games/${roomId}`).set({ t1: t1, t2: t2, letters: lets, colors: {}, state: 1, timer: 0, buzzer: null })
               .then(() => {
                   const newUrl = window.location.href.split('?')[0] + `?room=${roomId}`;
                   window.history.pushState({path:newUrl}, '', newUrl);
@@ -535,52 +508,46 @@
                 }
                 
                 const grid = document.getElementById('host-grid');
-                const qView = document.getElementById('host-question-view');
                 const results = document.getElementById('host-results');
                 const waiting = document.getElementById('host-waiting');
+                const buzzerAlert = document.getElementById('host-buzzer-alert');
 
-                if (d.activeQ && d.activeQ.visible) {
-                    grid.style.display = 'none';
-                    waiting.style.display = 'none';
+                if (d.state === 1 || d.state === 2) {
+                    grid.style.display = 'grid'; 
+                    waiting.style.display = 'none'; 
                     results.style.display = 'none';
-                    qView.style.display = 'flex'; 
                     
-                    document.getElementById('host-q-text').innerText = d.activeQ.text;
-                    
-                    if (d.activeQ.buzzer) {
-                        const bzName = d.activeQ.buzzer === 'red' ? d.t1 : d.t2;
-                        const bzColor = d.activeQ.buzzer === 'red' ? '#f44336' : '#00e676';
-                        const alertBox = document.getElementById('host-buzzer-alert');
-                        alertBox.innerHTML = `🚨 ${bzName} ضغط!`;
-                        alertBox.style.backgroundColor = bzColor;
-                        alertBox.style.display = 'block';
+                    grid.innerHTML = '';
+                    d.letters.forEach((l, i) => {
+                        const div = document.createElement('div'); div.className = `letter-box ${d.colors?.[i] || ''}`; div.innerText = l;
+                        grid.appendChild(div);
+                    });
+
+                    // مراقبة الجرس المستقل
+                    if (d.buzzer) {
+                        const bzName = d.buzzer === 'red' ? d.t1 : d.t2;
+                        const bzColor = d.buzzer === 'red' ? '#f44336' : '#00e676';
+                        buzzerAlert.innerHTML = `🚨 ${bzName} ضغط!`;
+                        buzzerAlert.style.backgroundColor = bzColor;
+                        buzzerAlert.style.display = 'block';
+                        
+                        // تشغيل الصوت لمرة واحدة
+                        if (d.buzzer !== lastBuzzer) {
+                            const audio = document.getElementById('audio-buzzer');
+                            audio.currentTime = 0;
+                            audio.play().catch(e => console.log(e));
+                            lastBuzzer = d.buzzer;
+                        }
                     } else {
-                        document.getElementById('host-buzzer-alert').style.display = 'none';
+                        buzzerAlert.style.display = 'none';
+                        lastBuzzer = null;
                     }
 
-                    if (d.activeQ.showAns) {
-                        document.getElementById('host-q-answer-display').style.display = 'block';
-                        document.getElementById('host-q-answer-display').innerText = "الإجابة: " + d.activeQ.answer;
-                    } else {
-                        document.getElementById('host-q-answer-display').style.display = 'none';
-                    }
-
-                } else {
-                    qView.style.display = 'none';
-                    
-                    if(d.state === 1 || d.state === 2) {
-                        grid.style.display = 'grid'; waiting.style.display = 'none'; results.style.display = 'none';
-                        grid.innerHTML = '';
-                        d.letters.forEach((l, i) => {
-                            const div = document.createElement('div'); div.className = `letter-box ${d.colors?.[i] || ''}`; div.innerText = l;
-                            grid.appendChild(div);
-                        });
-                    } else if (d.state === 3) {
-                        grid.style.display = 'none'; waiting.style.display = 'block'; results.style.display = 'none';
-                    } else if (d.state === 4) {
-                        grid.style.display = 'none'; waiting.style.display = 'none'; results.style.display = 'flex';
-                        renderFinalResults(d);
-                    }
+                } else if (d.state === 3) {
+                    grid.style.display = 'none'; waiting.style.display = 'block'; results.style.display = 'none';
+                } else if (d.state === 4) {
+                    grid.style.display = 'none'; waiting.style.display = 'none'; results.style.display = 'flex';
+                    renderFinalResults(d);
                 }
             });
         }
@@ -599,61 +566,12 @@
             document.getElementById('score-red').innerText = rScore; document.getElementById('score-green').innerText = gScore;
         }
 
-        function monitorQuestion() {
-            db.ref(`games/${roomId}/activeQ`).on('value', snap => {
-                const q = snap.val();
-                const overlay = document.getElementById('question-overlay');
-                if(q && q.visible) {
-                    overlay.style.display = 'flex';
-                    if(role === 'admin') {
-                        document.getElementById('q-char-disp').innerText = q.char;
-                        document.getElementById('q-text').innerText = q.text;
-                        
-                        // إظهار الإجابة للمقدم فوراً (سرية)
-                        document.getElementById('q-answer').style.display = 'block';
-                        document.getElementById('q-answer').style.color = '#fff';
-                        document.getElementById('q-answer').innerText = "الإجابة: " + q.answer;
-                        
-                        document.getElementById('admin-overlay-controls').style.display = 'block';
-                        document.getElementById('player-buzzer-area').style.display = 'none';
-                        document.getElementById('admin-buzzer-status').style.display = 'block';
-                        
-                        if(q.buzzer) {
-                            const teamName = q.buzzer === 'red' ? team1Name : team2Name;
-                            const teamColor = q.buzzer === 'red' ? "red" : "#2ed573";
-                            document.getElementById('admin-buzzer-status').innerHTML = `🔴 قام بالضغط: <span style="color:${teamColor}">${teamName}</span>`;
-                        } else {
-                            document.getElementById('admin-buzzer-status').innerText = "في انتظار ضغط الجرس...";
-                        }
-
-                    } else if (role === 'red' || role === 'green') {
-                        document.getElementById('q-char-disp').innerText = q.char;
-                        document.getElementById('q-text').innerText = "استمع لسؤال المقدم 🎤";
-                        document.getElementById('admin-overlay-controls').style.display = 'none';
-                        document.getElementById('admin-buzzer-status').style.display = 'none';
-                        document.getElementById('q-answer').style.display = 'none';
-                        document.getElementById('player-buzzer-area').style.display = 'block';
-                        const btn = document.getElementById('buzzer-btn');
-                        const msg = document.getElementById('buzzer-msg');
-                        if(q.buzzer) {
-                            btn.disabled = true; btn.style.opacity = "0.3";
-                            if(q.buzzer === role) { msg.innerText = "🎉 لك الأحقية! جاوب"; msg.style.color = "#2ed573"; } 
-                            else { msg.innerText = "🔒 الفريق الآخر ضغط أولاً"; msg.style.color = "red"; }
-                        } else {
-                            btn.disabled = false; btn.style.opacity = "1"; msg.innerText = "";
-                        }
-                    } else {
-                        overlay.style.display = 'none';
-                    }
-                } else {
-                    overlay.style.display = 'none';
-                }
-            });
-        }
-
         function initAdmin() {
             document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-admin').classList.add('active');
-            monitorQuestion();
+            
+            // إظهار زر تصفير الجرس للمقدم
+            document.getElementById('admin-reset-buzzer').style.display = 'block';
+
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
@@ -706,25 +624,28 @@
             const qData = questionsDB[char] || {medium:{q:"?",a:"?"}, hard1:{q:"?",a:"?"}, hard2:{q:"?",a:"?"}};
             const container = document.getElementById('admin-q-selection');
             container.innerHTML = `
-                <button class="q-select-btn" style="background:#00e676" onclick="triggerQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
-                <button class="q-select-btn" style="background:#ff9800" onclick="triggerQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
-                <button class="q-select-btn" style="background:#f44336" onclick="triggerQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
+                <button class="q-select-btn" style="background:#00e676" onclick="showQuestion('medium', '${char}')">متوسط: ${qData.medium.q}</button>
+                <button class="q-select-btn" style="background:#ff9800" onclick="showQuestion('hard1', '${char}')">صعب 1: ${qData.hard1.q}</button>
+                <button class="q-select-btn" style="background:#f44336" onclick="showQuestion('hard2', '${char}')">صعب 2: ${qData.hard2.q}</button>
             `;
+            // إخفاء الإجابة القديمة عند فتح النافذة
+            document.getElementById('adm-q-answer').style.display = 'none';
         }
-        function triggerQuestion(diff, char) {
+
+        // دالة جديدة تعرض السؤال للمقدم فقط
+        function showQuestion(diff, char) {
             const qData = questionsDB[char][diff];
-            db.ref(`games/${roomId}/activeQ`).set({ visible: true, char: char, text: qData.q, answer: qData.a, showAns: false, buzzer: null });
-            document.getElementById('admin-modal').style.display = 'none';
+            const ansBox = document.getElementById('adm-q-answer');
+            ansBox.innerText = "الإجابة: " + qData.a;
+            ansBox.style.display = 'block';
         }
-        function resetBuzzer() { db.ref(`games/${roomId}/activeQ/buzzer`).set(null); }
-        function toggleAnswer() { db.ref(`games/${roomId}/activeQ/showAns`).transaction(v => !v); }
-        function hideQuestionAndReturn() { db.ref(`games/${roomId}/activeQ`).set(null); document.getElementById('admin-modal').style.display = 'flex'; }
+
+        function resetGlobalBuzzer() { 
+            db.ref(`games/${roomId}/buzzer`).set(null); 
+        }
         
         function colorChar(c) {
-            let updates = {};
-            updates[`games/${roomId}/colors/${selIdx}`] = c;
-            updates[`games/${roomId}/activeQ`] = null; // إخفاء السؤال والعودة للشبكة
-            db.ref().update(updates);
+            db.ref(`games/${roomId}/colors/${selIdx}`).set(c);
             document.getElementById('admin-modal').style.display = 'none'; 
         }
         
@@ -738,15 +659,12 @@
 
         function initPlayer() {
             document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-player').classList.add('active');
-            monitorQuestion();
-            // هنا لا نستطيع معرفة الاسم فوراً لأن البيانات لم تصل بعد، سنعتمد على التحديث في listener
+            
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                // إعادة الضبط
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
 
-                // تحديث اسم الفريق
                 if(role === 'red') {
                     document.getElementById('p-team-name').innerText = d.t1;
                     document.getElementById('p-team-name').style.color = "var(--red)";
@@ -755,7 +673,27 @@
                     document.getElementById('p-team-name').style.color = "var(--green)";
                 }
 
-                // تحديث قائمة الكلمات المسجلة محلياً
+                // تحديث حالة الجرس للاعب
+                const btn = document.getElementById('buzzer-btn');
+                const status = document.getElementById('buzzer-status-msg');
+                
+                if(d.buzzer) {
+                    btn.disabled = true; 
+                    btn.style.opacity = "0.3";
+                    if(d.buzzer === role) {
+                        status.innerText = "🎉 أنت ضغطت أولاً!";
+                        status.style.color = "var(--green)";
+                    } else {
+                        status.innerText = "🔒 الفريق الآخر ضغط قبلك!";
+                        status.style.color = "red";
+                    }
+                } else {
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    status.innerText = "جاهز للضغط";
+                    status.style.color = "#4a148c";
+                }
+
                 const mySubmittedDiv = document.getElementById('my-submitted-list');
                 mySubmittedDiv.innerHTML = '';
                 mySubmittedWords = [];
@@ -778,7 +716,6 @@
             const w = document.getElementById('word-in').value.trim();
             if(!w) return;
             
-            // التحقق من التكرار
             if(mySubmittedWords.includes(w)) {
                 alert("⛔ لقد كتبت هذه الكلمة مسبقاً!");
                 return;
@@ -789,8 +726,10 @@
             document.getElementById('sent-msg').innerText = "تم الإرسال!"; 
             setTimeout(()=>document.getElementById('sent-msg').innerText='', 1500);
         }
+        
+        // دالة ضغط الجرس المستقلة
         function hitBuzzer() {
-            db.ref(`games/${roomId}/activeQ/buzzer`).transaction((currentVal) => {
+            db.ref(`games/${roomId}/buzzer`).transaction((currentVal) => {
                 if (currentVal === null) { return role; } else { return; } 
             });
         }

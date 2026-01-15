@@ -28,6 +28,15 @@
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: absolute; top: 0; left: 0; z-index: 1; }
         .active { display: flex; }
 
+        /* شاشة النهاية (القفل) */
+        #game-ended-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); z-index: 10000;
+            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        #game-ended-overlay h1 { font-size: 4rem; color: var(--primary); margin-bottom: 20px; }
+        #game-ended-overlay p { font-size: 1.5rem; color: #fff; }
+
         /* الشاشة الأولى */
         #scr-setup {
             background-image: url('47493.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;
@@ -58,7 +67,7 @@
         /* مؤثر الخطأ (X) */
         #wrong-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(100, 0, 0, 0.4); z-index: 10000;
+            background: rgba(100, 0, 0, 0.4); z-index: 9999;
             justify-content: center; align-items: center;
             animation: flashRed 0.5s;
         }
@@ -96,7 +105,7 @@
         .mobile-view { padding: 20px; text-align: center; justify-content: flex-start; overflow-y: auto; background: #f3e5f5; color: #333; }
         #timer-box { font-size: 3.5rem; color: var(--primary); font-family: monospace; text-shadow: 2px 2px 0 #000; background: rgba(0,0,0,0.3); padding: 5px 30px; border-radius: 15px; }
         
-        #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a148c; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 10px solid var(--primary); }
+        #question-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4a148c; z-index: 9990; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; border: 10px solid var(--primary); }
         #q-char-disp { font-size: 6rem; color: var(--primary); margin-bottom: 10px; text-shadow: 0 5px 0 #000; }
         #q-text { font-size: 2.2rem; margin-bottom: 20px; color: white; line-height: 1.4; font-weight: bold; }
         
@@ -150,7 +159,7 @@
             flex-direction: column; justify-content: center; align-items: center;
         }
 
-        /* --- تنبيه الجرس فقط (يظهر فوق الشبكة) --- */
+        /* --- تنبيه الجرس (للتلفزيون) --- */
         #host-buzzer-alert {
             display: none; 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -166,15 +175,30 @@
         
         /* زر تصفير الجرس للمقدم */
         #admin-reset-buzzer {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            position: sticky; bottom: 20px; margin: 10px auto; display: block;
             background: #fff; color: #333; padding: 15px 40px; 
             border-radius: 30px; font-size: 1.2rem; font-weight: bold;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 2px solid var(--red);
-            z-index: 2001; cursor: pointer; display: none; /* يظهر للمقدم فقط */
+            cursor: pointer;
+        }
+
+        /* تنبيه الجرس (للمقدم في الجوال) */
+        #admin-buzzer-notify {
+            display: none;
+            background: #f44336; color: white;
+            padding: 15px; border-radius: 10px;
+            font-size: 1.5rem; font-weight: bold;
+            text-align: center; margin-bottom: 10px;
+            animation: pulse 0.5s infinite;
         }
     </style>
 </head>
 <body>
+
+    <div id="game-ended-overlay">
+        <h1>🏁 انتهت اللعبة 🏁</h1>
+        <p>تم إغلاق اللعبة من قبل المقدم</p>
+    </div>
 
     <div id="wrong-overlay">
         <div class="x-symbol">✖</div>
@@ -251,12 +275,15 @@
     <div id="scr-admin" class="screen mobile-view">
         <h2 style="color:var(--bg-purple)">لوحة التحكم 🛠</h2>
         
+        <div id="admin-buzzer-notify">🚨 الأحمر ضغط!</div>
+
         <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
             <button style="background:#9c27b0; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('rules')">📢 الشرح</button>
             <button style="background:#e91e63; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('stop')">⏹️ إيقاف</button>
         </div>
 
         <div id="admin-p1">
+            <button id="admin-reset-buzzer" onclick="resetGlobalBuzzer()">🔄 تصفير الجرس</button>
             <p>اضغط الحرف لاختيار السؤال (لك أنت فقط):</p>
             <div id="admin-grid" class="grid-container" style="grid-template-columns: repeat(5, 1fr); zoom: 0.6;"></div>
             <button class="btn-start" onclick="setPhase(2)" style="width: 100%; margin-top: 20px;">الانتقال لمرحلة الكلمات</button>
@@ -286,8 +313,9 @@
             </div>
             <button style="background: var(--secondary); color:white; width: 100%; padding:15px; border-radius:10px;" onclick="publishResults()">📺 نشر النتائج</button>
         </div>
-        
-        <button id="admin-reset-buzzer" onclick="resetGlobalBuzzer()">🔄 تصفير الجرس</button>
+
+        <hr style="border-color: rgba(0,0,0,0.1); margin: 30px 0;">
+        <button onclick="endGamePermanently()" style="background: #333; color: white; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; border: 2px solid red;">🛑 إنهاء وإغلاق اللعبة</button>
     </div>
 
     <div id="scr-player" class="screen mobile-view">
@@ -302,7 +330,7 @@
             </div>
         </div>
         <div id="p-p2" style="display: none;">
-            <img src="hurry.jpg" class="hurry-img" alt="اخلصوا بسرعة">
+            <img src="48075.jpg" class="hurry-img" alt="انتظار">
             <h3>أكتب كلماتك:</h3>
             <div id="my-submitted-list"></div>
             <div id="p-letters-2" class="team-letters-strip" style="background:white;"></div>
@@ -404,6 +432,13 @@
             }
         }
 
+        // دالة إنهاء اللعبة نهائياً (القفل)
+        function endGamePermanently() {
+            if(confirm("هل أنت متأكد من إنهاء اللعبة وإغلاق الشاشات على الجميع؟")) {
+                db.ref(`games/${roomId}`).update({ state: 99 }); // 99 = Game Over Locked
+            }
+        }
+
         function playAudio(type) {
             db.ref(`games/${roomId}/action`).set({ type: type, ts: Date.now() });
         }
@@ -493,6 +528,14 @@
                 const d = s.val(); if(!d) return;
                 
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
+                
+                // حالة الإغلاق النهائي
+                if(d.state === 99) {
+                    document.getElementById('game-ended-overlay').style.display = 'flex';
+                    return; 
+                } else {
+                    document.getElementById('game-ended-overlay').style.display = 'none';
+                }
 
                 document.getElementById('lbl-t1').innerText = d.t1;
                 document.getElementById('lbl-t2').innerText = d.t2;
@@ -569,9 +612,6 @@
         function initAdmin() {
             document.getElementById('scr-setup').classList.remove('active'); document.getElementById('scr-admin').classList.add('active');
             
-            // إظهار زر تصفير الجرس للمقدم
-            document.getElementById('admin-reset-buzzer').style.display = 'block';
-
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
@@ -583,6 +623,25 @@
                 document.getElementById('adm-rev-t2').innerText = d.t2 + ":";
 
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
+                
+                // شاشة القفل للمقدم أيضاً
+                if(d.state === 99) {
+                    document.getElementById('game-ended-overlay').style.display = 'flex';
+                    return; 
+                } else {
+                    document.getElementById('game-ended-overlay').style.display = 'none';
+                }
+
+                // تنبيه الجرس في جوال المقدم
+                const notify = document.getElementById('admin-buzzer-notify');
+                if (d.buzzer) {
+                    const bzName = d.buzzer === 'red' ? d.t1 : d.t2;
+                    notify.style.display = 'block';
+                    notify.style.backgroundColor = d.buzzer === 'red' ? '#f44336' : '#00e676';
+                    notify.innerText = `🚨 ${bzName} ضغط!`;
+                } else {
+                    notify.style.display = 'none';
+                }
 
                 if(d.state === 1) {
                     const grid = document.getElementById('admin-grid'); grid.innerHTML = '';
@@ -664,6 +723,14 @@
                 const d = s.val(); if(!d) return;
                 
                 if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
+                
+                // قفل اللعبة على اللاعبين أيضاً
+                if(d.state === 99) {
+                    document.getElementById('game-ended-overlay').style.display = 'flex';
+                    return; 
+                } else {
+                    document.getElementById('game-ended-overlay').style.display = 'none';
+                }
 
                 if(role === 'red') {
                     document.getElementById('p-team-name').innerText = d.t1;

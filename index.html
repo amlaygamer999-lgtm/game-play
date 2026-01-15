@@ -227,9 +227,13 @@
 
     <div id="scr-connect" class="screen">
         <h1 style="color:var(--primary); font-size:3rem; margin-bottom:10px;">امسح للانضمام</h1>
+        
         <audio id="audio-rules" src="rules.mp3" preload="auto"></audio>
         <audio id="audio-wrong" src="wrong.mp3" preload="auto"></audio>
         <audio id="audio-buzzer" src="buzzer.mp3" preload="auto"></audio>
+        
+        <audio id="audio-remove" src="remove.mp3" preload="auto"></audio>
+        <audio id="audio-spit" src="spit.mp3" preload="auto"></audio>
         
         <div id="audio-visual" class="audio-wave">🔊 جاري تشغيل الصوت...</div>
         <div class="qr-row">
@@ -293,6 +297,8 @@
         <div id="admin-pre-game" style="background:white; padding:15px; border-radius:15px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
             <button style="background:#9c27b0; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('rules')">📢 الشرح</button>
             <button style="background:#e91e63; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('stop')">⏹️ إيقاف</button>
+            <button style="background:#d81b60; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('remove')">😂 الله يزيلك</button>
+            <button style="background:#00bcd4; color:white; width:45%; border-radius:15px; padding:15px;" onclick="playAudio('spit')">💦 تفي عليك</button>
         </div>
 
         <div id="admin-p1">
@@ -595,6 +601,13 @@
                         document.getElementById('audio-wrong').currentTime = 0;
                         document.getElementById('audio-buzzer').pause();
                         document.getElementById('audio-buzzer').currentTime = 0;
+                        
+                        // إيقاف الأصوات الجديدة
+                        const audRemove = document.getElementById('audio-remove');
+                        const audSpit = document.getElementById('audio-spit');
+                        if(audRemove) { audRemove.pause(); audRemove.currentTime = 0; }
+                        if(audSpit) { audSpit.pause(); audSpit.currentTime = 0; }
+
                         document.getElementById('audio-visual').style.display = 'none';
                         return;
                     }
@@ -610,6 +623,12 @@
                         const audio = document.getElementById('audio-rules');
                         audio.currentTime = 0;
                         audio.play().catch(e => {});
+                    } else if (act.type === 'remove') {
+                        const audio = document.getElementById('audio-remove');
+                        if(audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
+                    } else if (act.type === 'spit') {
+                        const audio = document.getElementById('audio-spit');
+                        if(audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
                     }
                     setTimeout(() => { document.getElementById('audio-visual').style.display = 'none'; }, 3000);
                 }

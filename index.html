@@ -28,14 +28,20 @@
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; position: absolute; top: 0; left: 0; z-index: 1; }
         .active { display: flex; }
 
-        /* شاشة النهاية (القفل) */
+        /* شاشة الطرد (إعادة المسح) */
+        #scr-rescan {
+            justify-content: center; text-align: center; background: #212121; z-index: 20000;
+        }
+        #scr-rescan h1 { font-size: 3rem; color: var(--red); margin-bottom: 20px; }
+        #scr-rescan p { font-size: 1.5rem; color: #fff; }
+
+        /* شاشة النهاية (القفل المؤقت) */
         #game-ended-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.95); z-index: 10000;
             flex-direction: column; justify-content: center; align-items: center; text-align: center;
         }
         #game-ended-overlay h1 { font-size: 4rem; color: var(--primary); margin-bottom: 20px; }
-        #game-ended-overlay p { font-size: 1.5rem; color: #fff; }
 
         /* الشاشة الأولى */
         #scr-setup {
@@ -197,7 +203,14 @@
 
     <div id="game-ended-overlay">
         <h1>🏁 انتهت اللعبة 🏁</h1>
-        <p>تم إغلاق اللعبة من قبل المقدم</p>
+        <p>انتظر تعليمات المقدم...</p>
+    </div>
+
+    <div id="scr-rescan" class="screen">
+        <h1>⚠️ تمت إعادة اللعبة</h1>
+        <p>الرجاء النظر للشاشة ومسح الكود الجديد للدخول مرة أخرى.</p>
+        <br>
+        <p style="color:#777">قم بتحديث الصفحة إذا لزم الأمر</p>
     </div>
 
     <div id="wrong-overlay">
@@ -230,7 +243,7 @@
     </div>
 
     <div id="scr-host" class="screen">
-        <button class="corner-btn reset-btn" onclick="fullReset()">🔄 إعادة اللعبة</button>
+        <button class="corner-btn reset-btn" onclick="fullReset()">🔄 إعادة اللعبة (طرد الجميع)</button>
         <button class="corner-btn back-qr-btn" onclick="toggleQR()">🔙 عرض الباركود</button>
 
         <div id="host-qr-overlay">
@@ -427,8 +440,12 @@
         };
 
         function fullReset() {
-            if(confirm("تحذير: سيتم إعادة اللعبة بالكامل وطرد جميع اللاعبين. هل أنت متأكد؟")) {
-                db.ref(`games/${roomId}`).set({ state: 'reset' });
+            if(confirm("تحذير: هذا سيطرد الجميع ويعيد اللعبة من الصفر. هل أنت متأكد؟")) {
+                db.ref(`games/${roomId}`).update({ state: 'kick_all' });
+                // إعادة تحميل التلفزيون بعد ثانية
+                setTimeout(() => {
+                    window.location.href = window.location.pathname; // إزالة الـ room id للبدء من جديد
+                }, 1000);
             }
         }
 
@@ -527,8 +544,6 @@
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
-                
                 // حالة الإغلاق النهائي
                 if(d.state === 99) {
                     document.getElementById('game-ended-overlay').style.display = 'flex';
@@ -615,15 +630,12 @@
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                team1Name = d.t1;
-                team2Name = d.t2;
-                document.getElementById('btn-win-red').innerText = d.t1;
-                document.getElementById('btn-win-green').innerText = d.t2;
-                document.getElementById('adm-rev-t1').innerText = d.t1 + ":";
-                document.getElementById('adm-rev-t2').innerText = d.t2 + ":";
+                // حالة الطرد (للمقدم إذا كان يتابع من الجوال)
+                if(d.state === 'kick_all') {
+                    showRescanScreen();
+                    return;
+                }
 
-                if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
-                
                 // شاشة القفل للمقدم أيضاً
                 if(d.state === 99) {
                     document.getElementById('game-ended-overlay').style.display = 'flex';
@@ -631,6 +643,13 @@
                 } else {
                     document.getElementById('game-ended-overlay').style.display = 'none';
                 }
+
+                team1Name = d.t1;
+                team2Name = d.t2;
+                document.getElementById('btn-win-red').innerText = d.t1;
+                document.getElementById('btn-win-green').innerText = d.t2;
+                document.getElementById('adm-rev-t1').innerText = d.t1 + ":";
+                document.getElementById('adm-rev-t2').innerText = d.t2 + ":";
 
                 // تنبيه الجرس في جوال المقدم
                 const notify = document.getElementById('admin-buzzer-notify');
@@ -722,9 +741,13 @@
             db.ref(`games/${roomId}`).on('value', s => {
                 const d = s.val(); if(!d) return;
                 
-                if(d.state === 'reset') { window.location.href = window.location.pathname; return; }
-                
-                // قفل اللعبة على اللاعبين أيضاً
+                // حالة الطرد (للمتسابقين)
+                if(d.state === 'kick_all') {
+                    showRescanScreen();
+                    return;
+                }
+
+                // قفل اللعبة
                 if(d.state === 99) {
                     document.getElementById('game-ended-overlay').style.display = 'flex';
                     return; 
@@ -779,6 +802,13 @@
                 else if(d.state >= 3) { document.getElementById('p-p2').style.display = 'none'; document.getElementById('p-p3').style.display = 'block'; }
             });
         }
+
+        // دالة لإظهار شاشة الطرد
+        function showRescanScreen() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('scr-rescan').classList.add('active');
+        }
+
         function sendWord() {
             const w = document.getElementById('word-in').value.trim();
             if(!w) return;
